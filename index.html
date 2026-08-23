@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ThreatLens — See through phishing before it sees you</title>
+<meta name="description" content="ThreatLens is a Chrome extension that analyzes every site, link, QR code and download in real time — and shows you exactly why something looks dangerous." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230A0E13'/%3E%3Ccircle cx='14' cy='14' r='8.2' stroke='%2349D6C4' stroke-width='2.4' fill='none'/%3E%3Cline x1='19.8' y1='19.8' x2='26' y2='26' stroke='%2349D6C4' stroke-width='2.4' stroke-linecap='round'/%3E%3Cpath d='M14 10.5V14L16.5 16.2' stroke='%2349D6C4' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#0A0E13;
+    --bg-elev:#121821;
+    --bg-elev-2:#1A222D;
+    --border:#232C38;
+    --border-soft:#1B222C;
+    --text:#E9EEF3;
+    --text-dim:#8C99A6;
+    --text-faint:#54606C;
+    --accent:#49D6C4;
+    --accent-soft:rgba(73,214,196,.12);
+    --accent-line:rgba(73,214,196,.35);
+    --safe:#3ED88F;
+    --suspicious:#F4BA42;
+    --danger:#F15B52;
+    --font-display:'Pixelify Sans', sans-serif;
+    --font-body:'Inter', sans-serif;
+    --font-mono:'JetBrains Mono', monospace;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important;}
+  }
+
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-body);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  a{color:inherit; text-decoration:none;}
+  button{font-family:inherit; cursor:pointer;}
+  img,svg{display:block;}
+
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:0 32px;
+  }
+
+  ::selection{ background:var(--accent-soft); color:var(--accent); }
+
+  :focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:3px;
+    border-radius:4px;
+  }
+
+  /* background texture */
+  .grid-field{
+    position:fixed; inset:0; z-index:-2;
+    background-image:
+      linear-gradient(var(--border-soft) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border-soft) 1px, transparent 1px);
+    background-size:64px 64px;
+    -webkit-mask-image: radial-gradient(ellipse 95% 95% at 50% 50%, black 55%, transparent 100%);
+            mask-image: radial-gradient(ellipse 95% 95% at 50% 50%, black 55%, transparent 100%);
+    opacity:.45;
+  }
+
+  /* ---------- NAV ---------- */
+  header{
+    position:sticky; top:0; z-index:100;
+    background:rgba(10,14,19,.78);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border-soft);
+  }
+  nav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 32px;
+    max-width:1180px; margin:0 auto;
+  }
+  .logo{
+    display:flex; align-items:center; gap:10px;
+    font-family:var(--font-display); font-weight:600; font-size:19px;
+    letter-spacing:.01em;
+  }
+  .logo-mark{ width:26px; height:26px; flex-shrink:0; }
+  .nav-links{ display:flex; gap:36px; align-items:center; }
+  .nav-links a{
+    font-size:14.5px; color:var(--text-dim); transition:color .2s ease;
+    position:relative;
+  }
+  .nav-links a:hover{ color:var(--text); }
+  .nav-cta{ display:flex; align-items:center; gap:14px; }
+  .nav-toggle{ display:none; background:none; border:none; color:var(--text); }
+
+  .btn{
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size:14.5px;
+    padding:11px 20px;
+    border-radius:8px;
+    border:1px solid transparent;
+    display:inline-flex; align-items:center; gap:9px;
+    transition:transform .15s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
+  }
+  .btn-primary{
+    background:var(--accent);
+    color:#04140F;
+  }
+  .btn-primary:hover{ transform:translateY(-1px); box-shadow:0 8px 24px -8px rgba(73,214,196,.5); }
+  .btn-primary:active{ transform:translateY(0); }
+  .btn-ghost{
+    background:transparent;
+    border-color:var(--border);
+    color:var(--text);
+  }
+  .btn-ghost:hover{ border-color:var(--accent-line); color:var(--accent); }
+  .btn-sm{ padding:8px 14px; font-size:13px; }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    padding:96px 0 70px;
+    position:relative;
+  }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:var(--font-mono);
+    font-size:12.5px;
+    color:var(--accent);
+    background:var(--accent-soft);
+    border:1px solid var(--accent-line);
+    padding:6px 12px;
+    border-radius:20px;
+    margin-bottom:28px;
+  }
+  .eyebrow .dot{ width:6px; height:6px; border-radius:50%; background:var(--accent); animation:pulse 2s infinite; }
+  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:.3;} }
+
+  .hero-grid{
+    display:grid;
+    grid-template-columns:1.05fr .95fr;
+    gap:56px;
+    align-items:center;
+  }
+  h1{
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size:clamp(38px, 4.6vw, 60px);
+    line-height:1.04;
+    letter-spacing:-.01em;
+  }
+  h1 .accent-word{ color:var(--accent); }
+  .hero-sub{
+    margin-top:22px;
+    font-size:17.5px;
+    color:var(--text-dim);
+    max-width:480px;
+    line-height:1.65;
+  }
+  .hero-actions{
+    margin-top:36px;
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  }
+  .hero-meta{
+    margin-top:22px;
+    font-family:var(--font-mono);
+    font-size:12.5px;
+    color:var(--text-faint);
+    display:flex; gap:18px; flex-wrap:wrap;
+  }
+  .hero-meta span{ display:flex; align-items:center; gap:7px; }
+  .hero-meta svg{ width:13px; height:13px; opacity:.7; }
+
+  /* ---------- SCANNER (signature element) ---------- */
+  .scanner{
+    background:var(--bg-elev);
+    border:1px solid var(--border);
+    border-radius:16px;
+    overflow:hidden;
+    box-shadow:0 40px 80px -40px rgba(0,0,0,.7);
+  }
+  .scanner-chrome{
+    display:flex; align-items:center; gap:8px;
+    padding:12px 14px;
+    background:var(--bg-elev-2);
+    border-bottom:1px solid var(--border);
+  }
+  .scanner-chrome .dots{ display:flex; gap:6px; }
+  .scanner-chrome .dots i{ width:9px; height:9px; border-radius:50%; background:var(--border); display:block; }
+  .scanner-bar{
+    flex:1;
+    display:flex; align-items:center; gap:8px;
+    background:var(--bg);
+    border:1px solid var(--border);
+    border-radius:7px;
+    padding:7px 10px;
+    font-family:var(--font-mono);
+    font-size:12.5px;
+    color:var(--text-dim);
+  }
+  .scanner-bar svg{ width:12px; height:12px; flex-shrink:0; opacity:.6; }
+
+  .scanner-body{ padding:22px; }
+  .scan-input-row{
+    display:flex; gap:8px; margin-bottom:16px;
+  }
+  #urlInput{
+    flex:1;
+    background:var(--bg);
+    border:1px solid var(--border);
+    color:var(--text);
+    font-family:var(--font-mono);
+    font-size:13px;
+    padding:11px 13px;
+    border-radius:8px;
+    transition:border-color .2s ease;
+  }
+  #urlInput:focus{ border-color:var(--accent-line); outline:none; }
+  #urlInput::placeholder{ color:var(--text-faint); }
+
+  .try-row{
+    display:flex; gap:7px; flex-wrap:wrap; margin-bottom:18px;
+  }
+  .try-chip{
+    font-family:var(--font-mono);
+    font-size:11.5px;
+    color:var(--text-dim);
+    background:var(--bg);
+    border:1px solid var(--border);
+    padding:6px 10px;
+    border-radius:6px;
+    transition:border-color .15s ease, color .15s ease;
+  }
+  .try-chip:hover{ border-color:var(--accent-line); color:var(--accent); }
+
+  .scan-stage{
+    position:relative;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:linear-gradient(180deg, var(--bg) 0%, var(--bg-elev) 100%);
+    min-height:196px;
+    padding:20px;
+    overflow:hidden;
+  }
+  .scan-line{
+    position:absolute; left:0; right:0; top:0;
+    height:2px;
+    background:linear-gradient(90deg, transparent, var(--accent), transparent);
+    box-shadow:0 0 16px 2px var(--accent);
+    opacity:0;
+    pointer-events:none;
+  }
+  .scan-line.active{ animation:sweep 1.1s cubic-bezier(.4,0,.2,1); }
+  @keyframes sweep{
+    0%{ top:0; opacity:1; }
+    95%{ opacity:1; }
+    100%{ top:100%; opacity:0; }
+  }
+
+  .scan-placeholder{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    height:156px;
+    color:var(--text-faint);
+    font-size:13px;
+    text-align:center;
+    gap:10px;
+  }
+  .scan-placeholder svg{ width:28px; height:28px; opacity:.5; }
+
+  .result{ display:none; }
+  .result.show{ display:block; animation:fadeUp .4s ease; }
+  @keyframes fadeUp{ from{ opacity:0; transform:translateY(6px);} to{ opacity:1; transform:translateY(0);} }
+
+  .result-top{
+    display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;
+    gap:12px; flex-wrap:wrap;
+  }
+  .verdict-badge{
+    font-family:var(--font-display); font-weight:600; font-size:13px;
+    padding:6px 12px; border-radius:6px;
+    letter-spacing:.03em;
+  }
+  .score-dial{
+    display:flex; align-items:baseline; gap:5px;
+    font-family:var(--font-mono);
+  }
+  .score-dial .num{ font-size:30px; font-weight:600; }
+  .score-dial .max{ font-size:13px; color:var(--text-faint); }
+
+  .reasons{ display:flex; flex-direction:column; gap:8px; }
+  .reason{
+    display:flex; gap:9px; align-items:flex-start;
+    font-size:13px; color:var(--text-dim);
+    padding:9px 11px;
+    background:var(--bg-elev-2);
+    border-radius:7px;
+    border:1px solid var(--border);
+  }
+  .reason svg{ width:14px; height:14px; flex-shrink:0; margin-top:1px; }
+
+  /* verdict color states */
+  .v-safe .verdict-badge{ background:rgba(62,216,143,.14); color:var(--safe); }
+  .v-safe .score-dial .num{ color:var(--safe); }
+  .v-safe .reason svg{ color:var(--safe); }
+  .v-suspicious .verdict-badge{ background:rgba(244,186,66,.14); color:var(--suspicious); }
+  .v-suspicious .score-dial .num{ color:var(--suspicious); }
+  .v-suspicious .reason svg{ color:var(--suspicious); }
+  .v-high .verdict-badge{ background:rgba(241,91,82,.14); color:var(--danger); }
+  .v-high .score-dial .num{ color:var(--danger); }
+  .v-high .reason svg{ color:var(--danger); }
+  .v-dangerous .verdict-badge{ background:rgba(241,91,82,.18); color:var(--danger); }
+  .v-dangerous .score-dial .num{ color:var(--danger); }
+  .v-dangerous .reason svg{ color:var(--danger); }
+
+  /* ---------- STATS ---------- */
+  .stats{
+    border-top:1px solid var(--border-soft);
+    border-bottom:1px solid var(--border-soft);
+    padding:44px 0;
+  }
+  .stats-row{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:24px;
+  }
+  .stat{ text-align:left; }
+  .stat .num{
+    font-family:var(--font-display); font-weight:600;
+    font-size:clamp(26px,3vw,36px);
+    color:var(--text);
+  }
+  .stat .num .accent{ color:var(--accent); }
+  .stat .label{ font-size:13px; color:var(--text-faint); margin-top:6px; }
+
+  /* ---------- SECTION HEADERS ---------- */
+  section{ padding:100px 0; }
+  .section-head{ max-width:600px; margin-bottom:56px; }
+  .kicker{
+    font-family:var(--font-mono); font-size:12.5px; color:var(--accent);
+    text-transform:uppercase; letter-spacing:.08em; margin-bottom:14px; display:block;
+  }
+  h2{
+    font-family:var(--font-display); font-weight:600;
+    font-size:clamp(28px,3.4vw,40px);
+    letter-spacing:-.01em;
+    line-height:1.15;
+  }
+  .section-desc{ margin-top:16px; color:var(--text-dim); font-size:16px; line-height:1.7; }
+
+  /* ---------- FEATURES ---------- */
+  .feature-grid{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:1px;
+    background:var(--border-soft);
+    border:1px solid var(--border-soft);
+    border-radius:14px;
+    overflow:hidden;
+  }
+  .feature{
+    background:var(--bg);
+    padding:32px 28px;
+    transition:background .2s ease;
+  }
+  .feature:hover{ background:var(--bg-elev); }
+  .feature-icon{
+    width:38px; height:38px;
+    border-radius:9px;
+    background:var(--accent-soft);
+    border:1px solid var(--accent-line);
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom:18px;
+  }
+  .feature-icon svg{ width:18px; height:18px; color:var(--accent); }
+  .feature h3{
+    font-family:var(--font-display); font-weight:600; font-size:16.5px; margin-bottom:9px;
+  }
+  .feature p{ font-size:14px; color:var(--text-dim); line-height:1.65; }
+
+  /* ---------- PIPELINE ---------- */
+  .pipeline{
+    display:flex; align-items:stretch; gap:0;
+    border:1px solid var(--border-soft);
+    border-radius:14px;
+    overflow:hidden;
+  }
+  .pipe-step{
+    flex:1; padding:30px 24px; position:relative;
+    background:var(--bg);
+  }
+  .pipe-step:nth-child(even){ background:var(--bg-elev); }
+  .pipe-num{
+    font-family:var(--font-mono); font-size:12px; color:var(--accent);
+    margin-bottom:14px; display:block;
+  }
+  .pipe-step h4{
+    font-family:var(--font-display); font-size:15.5px; font-weight:600; margin-bottom:8px;
+  }
+  .pipe-step p{ font-size:13px; color:var(--text-dim); line-height:1.6; }
+  .pipe-arrow{
+    display:flex; align-items:center; justify-content:center;
+    width:0; position:relative;
+  }
+  .pipe-arrow svg{
+    position:absolute; left:-11px; top:50%; transform:translateY(-50%);
+    width:22px; height:22px; color:var(--text-faint); background:var(--bg); border-radius:50%;
+    z-index:2;
+  }
+
+  /* ---------- EXPLAIN ---------- */
+  .explain-wrap{
+    display:grid; grid-template-columns:.9fr 1.1fr; gap:56px; align-items:center;
+  }
+  .explain-list{ display:flex; flex-direction:column; gap:20px; margin-top:28px; }
+  .explain-item{ display:flex; gap:14px; }
+  .explain-item .idx{
+    font-family:var(--font-mono); font-size:12px; color:var(--accent);
+    width:24px; flex-shrink:0; padding-top:2px;
+  }
+  .explain-item h4{ font-family:var(--font-display); font-size:15px; font-weight:600; margin-bottom:5px; }
+  .explain-item p{ font-size:13.5px; color:var(--text-dim); line-height:1.6; }
+
+  .mock-card{
+    background:var(--bg-elev); border:1px solid var(--border); border-radius:14px;
+    padding:26px;
+  }
+  .mock-url{
+    font-family:var(--font-mono); font-size:12.5px; color:var(--text-dim);
+    padding-bottom:16px; border-bottom:1px solid var(--border); margin-bottom:18px;
+    word-break:break-all;
+  }
+  .shap-bar-row{ display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+  .shap-label{ font-size:12.5px; color:var(--text-dim); width:168px; flex-shrink:0; }
+  .shap-track{ flex:1; height:7px; background:var(--bg); border-radius:4px; overflow:hidden; }
+  .shap-fill{ height:100%; border-radius:4px; background:var(--danger); }
+  .shap-val{ font-family:var(--font-mono); font-size:11.5px; color:var(--text-faint); width:36px; text-align:right; }
+
+  /* ---------- CTA ---------- */
+  .cta-section{
+    text-align:center;
+    padding:110px 0;
+  }
+  .cta-box{
+    max-width:640px; margin:0 auto;
+  }
+  .cta-box h2{ margin-bottom:16px; }
+  .cta-box p{ color:var(--text-dim); font-size:16.5px; margin-bottom:38px; }
+  .browser-chip{
+    display:inline-flex; align-items:center; gap:10px;
+    font-family:var(--font-mono); font-size:12.5px; color:var(--text-faint);
+    margin-top:22px;
+  }
+  .browser-chip svg{ width:16px; height:16px; }
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    border-top:1px solid var(--border-soft);
+    padding:40px 0;
+  }
+  .footer-row{
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;
+  }
+  .footer-links{ display:flex; gap:24px; }
+  .footer-links a{ font-size:13px; color:var(--text-faint); transition:color .2s ease; }
+  .footer-links a:hover{ color:var(--text-dim); }
+  .footer-note{ font-size:12.5px; color:var(--text-faint); }
+
+  /* ---------- MODAL ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(6,8,11,.7); backdrop-filter:blur(4px);
+    display:flex; align-items:center; justify-content:center; z-index:1000;
+    opacity:0; pointer-events:none; transition:opacity .2s ease;
+    padding:20px;
+  }
+  .modal-overlay.open{ opacity:1; pointer-events:auto; }
+  .modal{
+    background:var(--bg-elev); border:1px solid var(--border); border-radius:16px;
+    width:100%; max-width:400px; padding:28px;
+    transform:translateY(12px) scale(.98); transition:transform .25s cubic-bezier(.2,.9,.3,1.2);
+  }
+  .modal-overlay.open .modal{ transform:translateY(0) scale(1); }
+  .modal-icon{
+    width:48px; height:48px; border-radius:12px;
+    background:var(--accent-soft); border:1px solid var(--accent-line);
+    display:flex; align-items:center; justify-content:center; margin-bottom:18px;
+  }
+  .modal-icon svg{ width:24px; height:24px; color:var(--accent); }
+  .modal h3{ font-family:var(--font-display); font-size:18px; font-weight:600; margin-bottom:8px; }
+  .modal p{ font-size:13.5px; color:var(--text-dim); line-height:1.6; margin-bottom:20px; }
+  .perm-list{ display:flex; flex-direction:column; gap:10px; margin-bottom:22px; }
+  .perm-item{ display:flex; gap:10px; align-items:flex-start; font-size:13px; color:var(--text-dim); }
+  .perm-item svg{ width:14px; height:14px; flex-shrink:0; margin-top:2px; color:var(--text-faint); }
+  .modal-actions{ display:flex; gap:10px; }
+  .modal-actions .btn{ flex:1; justify-content:center; }
+  .modal-success{ display:none; text-align:center; }
+  .modal-success.show{ display:block; }
+  .modal-success .modal-icon{ margin:0 auto 18px; }
+  .modal-permstate{ display:block; }
+  .modal-permstate.hide{ display:none; }
+  .modal-close-x{
+    position:absolute; top:18px; right:18px; background:none; border:none; color:var(--text-faint);
+  }
+
+  /* ---------- HOW-IT-WORKS WALKTHROUGH MODAL ---------- */
+  .how-modal{ max-width:480px; padding:24px; }
+  .how-progress{
+    display:flex; gap:6px; margin-bottom:26px;
+  }
+  .how-seg{
+    flex:1; height:3px; border-radius:2px; background:var(--border); overflow:hidden;
+  }
+  .how-seg-fill{
+    height:100%; width:0%; background:var(--accent); border-radius:2px;
+  }
+  .how-seg-fill.animating{ transition:width linear; }
+  .how-seg-fill.filled{ width:100%; }
+
+  .how-stage{ min-height:220px; }
+  .how-num{
+    font-family:var(--font-mono); font-size:12.5px; color:var(--accent);
+    display:block; margin-bottom:16px;
+  }
+  .how-icon{
+    width:52px; height:52px; border-radius:13px;
+    background:var(--accent-soft); border:1px solid var(--accent-line);
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom:20px;
+  }
+  .how-icon svg{ width:24px; height:24px; color:var(--accent); }
+  .how-stage h3{ font-family:var(--font-display); font-weight:600; font-size:21px; margin-bottom:10px; }
+  .how-stage p{ font-size:14.5px; color:var(--text-dim); line-height:1.7; }
+  .how-stage-content{ animation:fadeUp .35s ease; }
+
+  .how-nav{
+    display:flex; align-items:center; justify-content:space-between; margin-top:26px;
+  }
+  .how-dots{ display:flex; gap:7px; }
+  .how-dot{
+    width:7px; height:7px; border-radius:50%; background:var(--border);
+    border:none; padding:0; transition:background .2s ease, transform .2s ease;
+  }
+  .how-dot.active{ background:var(--accent); transform:scale(1.3); }
+  .how-nav-btn{
+    display:flex; align-items:center; gap:6px;
+    background:none; border:none; color:var(--text-dim);
+    font-family:var(--font-body); font-size:13.5px; font-weight:500;
+    padding:6px 4px; transition:color .2s ease;
+  }
+  .how-nav-btn:hover{ color:var(--text); }
+  .how-nav-btn:disabled{ opacity:.35; pointer-events:none; }
+  .how-nav-btn svg{ width:15px; height:15px; }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width:900px){
+    .hero-grid{ grid-template-columns:1fr; }
+    .feature-grid{ grid-template-columns:repeat(2,1fr); }
+    .stats-row{ grid-template-columns:repeat(2,1fr); row-gap:28px; }
+    .explain-wrap{ grid-template-columns:1fr; }
+    .pipeline{ flex-direction:column; }
+    .pipe-arrow{ display:none; }
+  }
+  @media (max-width:640px){
+    .wrap{ padding:0 20px; }
+    nav{ padding:16px 20px; }
+    .nav-links{ display:none; }
+    .nav-toggle{ display:block; }
+    section{ padding:64px 0; }
+    .feature-grid{ grid-template-columns:1fr; }
+    .hero{ padding:56px 0 48px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="grid-field"></div>
+
+<header>
+  <nav>
+    <div class="logo">
+      <svg class="logo-mark" viewBox="0 0 26 26" fill="none">
+        <circle cx="11" cy="11" r="7.5" stroke="#49D6C4" stroke-width="2"/>
+        <line x1="16.2" y1="16.2" x2="23" y2="23" stroke="#49D6C4" stroke-width="2" stroke-linecap="round"/>
+        <path d="M11 7.5V11L13.5 13" stroke="#49D6C4" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      ThreatLens
+    </div>
+    <div class="nav-links">
+      <a href="#scanner">Live scan</a>
+      <a href="#features">Features</a>
+      <a href="#pipeline">How it works</a>
+      <a href="#explain">Explainability</a>
+    </div>
+    <div class="nav-cta">
+      <button class="btn btn-primary btn-sm" onclick="openInstallModal()">Add to Chrome</button>
+      <button class="nav-toggle" aria-label="Menu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section class="hero" id="scanner">
+    <div class="wrap">
+      <div class="hero-grid">
+        <div>
+          <span class="eyebrow"><span class="dot"></span> Real-time protection, right in your browser</span>
+          <h1>See through phishing<br>before it <span class="accent-word">sees you</span>.</h1>
+          <p class="hero-sub">ThreatLens inspects every site, link, QR code and download the moment you encounter it — and tells you, in plain language, exactly why something looks dangerous.</p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" onclick="openInstallModal()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+              Add to Chrome — it's free
+            </button>
+            <button class="btn btn-ghost" onclick="openHowModal()">See how it works</button>
+          </div>
+          <div class="hero-meta">
+            <span><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10V6l8-4z" stroke="currentColor" stroke-width="1.6"/></svg>No data leaves your device unencrypted</span>
+            <span><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/></svg>Manifest V3</span>
+          </div>
+        </div>
+
+        <!-- SIGNATURE INTERACTIVE SCANNER -->
+        <div class="scanner">
+          <div class="scanner-chrome">
+            <div class="dots"><i></i><i></i><i></i></div>
+            <div class="scanner-bar">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10V6l8-4z" stroke="currentColor" stroke-width="1.6"/></svg>
+              ThreatLens — live scan
+            </div>
+          </div>
+          <div class="scanner-body">
+            <div class="scan-input-row">
+              <input id="urlInput" type="text" placeholder="Paste a URL to analyze…" autocomplete="off" />
+              <button class="btn btn-primary btn-sm" onclick="runScan()">Analyze</button>
+            </div>
+            <div class="try-row">
+              <span style="font-family:var(--font-mono); font-size:11.5px; color:var(--text-faint); padding-top:6px;">Try:</span>
+              <button class="try-chip" onclick="quickScan(0)">paypa1-secure-login.com</button>
+              <button class="try-chip" onclick="quickScan(2)">mail-google-support.com</button>
+              <button class="try-chip" onclick="quickScan(3)">github.com/anthropics</button>
+            </div>
+            <div class="scan-stage">
+              <div class="scan-line" id="scanLine"></div>
+              <div class="scan-placeholder" id="scanPlaceholder">
+                <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7.5" stroke="currentColor" stroke-width="1.6"/><line x1="16.2" y1="16.2" x2="21" y2="21" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                Paste a link or pick an example above
+              </div>
+              <div class="result" id="result">
+                <div class="result-top">
+                  <span class="verdict-badge" id="verdictBadge">SAFE</span>
+                  <div class="score-dial"><span class="num" id="scoreNum">0</span><span class="max">/100 risk</span></div>
+                </div>
+                <div class="reasons" id="reasonsList"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="stats">
+    <div class="wrap">
+      <div class="stats-row">
+        <div class="stat"><div class="num"><span class="accent" data-count="4200" data-suffix="+">0</span></div><div class="label">Sites scanned since launch</div></div>
+        <div class="stat"><div class="num"><span class="accent" data-count="86">0</span></div><div class="label">Threats blocked</div></div>
+        <div class="stat"><div class="num"><span class="accent" data-count="14">0</span></div><div class="label">QR threats caught</div></div>
+        <div class="stat"><div class="num"><span class="accent" data-count="96" data-suffix=".8%">0</span></div><div class="label">Detection precision (early beta)</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="kicker">Coverage</span>
+        <h2>One extension, every entry point.</h2>
+        <p class="section-desc">Phishing doesn't only arrive as a suspicious link — it hides in look-alike domains, urgent login forms, QR codes on posters, and files disguised as invoices. ThreatLens watches all of it.</p>
+      </div>
+      <div class="feature-grid">
+        <div class="feature">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><line x1="16" y1="16" x2="21" y2="21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+          <h3>Real-time site analysis</h3>
+          <p>Domain age, redirect chains, obfuscated URLs and reputation signals are checked the instant a page loads — before you type a password.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12l6 6L20 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h3>Brand impersonation detection</h3>
+          <p>Catches look-alike domains and typosquats of banks, payment providers and government portals, and names the brand it's mimicking.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M4 9h16" stroke="currentColor" stroke-width="1.8"/></svg></div>
+          <h3>Page &amp; form behavior</h3>
+          <p>Reads the DOM for password fields, OTP prompts and urgent language — the same tells a trained analyst looks for, applied to every page.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="6" height="6" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="4" width="6" height="6" stroke="currentColor" stroke-width="1.8"/><rect x="4" y="14" width="6" height="6" stroke="currentColor" stroke-width="1.8"/><line x1="14" y1="14" x2="20" y2="20" stroke="currentColor" stroke-width="1.8"/></svg></div>
+          <h3>QR-code inspection</h3>
+          <p>Decodes any QR code rendered on a page and checks its destination before you ever scan it with your phone.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0l-4-4m4 4l4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+          <h3>Download protection</h3>
+          <p>Flags double extensions, mismatched file types and risky archive contents, with hash-based reputation lookups.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10V6l8-4z" stroke="currentColor" stroke-width="1.8"/></svg></div>
+          <h3>Webmail link scanning</h3>
+          <p>Highlights dangerous links directly inside Gmail and Outlook web, before you click through from an email.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PIPELINE -->
+  <section id="pipeline">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="kicker">Under the hood</span>
+        <h2>From page load to protection, in milliseconds.</h2>
+        <p class="section-desc">Every check runs through the same pipeline — a gradient-boosted model trained on phishing patterns, scored and explained before you ever see a warning.</p>
+      </div>
+      <div class="pipeline">
+        <div class="pipe-step">
+          <span class="pipe-num">01</span>
+          <h4>Capture</h4>
+          <p>The extension reads the URL, DOM structure and any links, QR codes or downloads on the page.</p>
+        </div>
+        <div class="pipe-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="pipe-step">
+          <span class="pipe-num">02</span>
+          <h4>Analyze</h4>
+          <p>An XGBoost model scores dozens of features against threat intelligence and domain reputation data.</p>
+        </div>
+        <div class="pipe-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="pipe-step">
+          <span class="pipe-num">03</span>
+          <h4>Explain</h4>
+          <p>SHAP attribution turns the model's output into the plain-language reasons you actually see.</p>
+        </div>
+        <div class="pipe-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="pipe-step">
+          <span class="pipe-num">04</span>
+          <h4>Act</h4>
+          <p>Depending on the score, ThreatLens allows, warns, or blocks the page — you can always continue anyway.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPLAINABILITY -->
+  <section id="explain">
+    <div class="wrap">
+      <div class="explain-wrap">
+        <div>
+          <span class="kicker">Explainable AI</span>
+          <h2>Never just "trust us."</h2>
+          <p class="section-desc" style="margin-bottom:0;">Every verdict comes with the specific signals that drove it — ranked by how much each one contributed to the score.</p>
+          <div class="explain-list">
+            <div class="explain-item">
+              <span class="idx">01</span>
+              <div><h4>Feature attribution</h4><p>SHAP values show exactly which signal moved the score, and by how much.</p></div>
+            </div>
+            <div class="explain-item">
+              <span class="idx">02</span>
+              <div><h4>Plain-language reasons</h4><p>No jargon — "this domain was registered 3 days ago," not a raw feature name.</p></div>
+            </div>
+            <div class="explain-item">
+              <span class="idx">03</span>
+              <div><h4>You decide the last step</h4><p>High-risk pages are blocked by default, with an explicit "continue anyway" if you disagree.</p></div>
+            </div>
+          </div>
+        </div>
+        <div class="mock-card">
+          <div class="mock-url">paypa1-secure-login.com/verify</div>
+          <div class="shap-bar-row"><span class="shap-label">Domain age (3 days)</span><div class="shap-track"><div class="shap-fill" style="width:88%; background:var(--danger);"></div></div><span class="shap-val">+34</span></div>
+          <div class="shap-bar-row"><span class="shap-label">Character substitution</span><div class="shap-track"><div class="shap-fill" style="width:74%; background:var(--danger);"></div></div><span class="shap-val">+29</span></div>
+          <div class="shap-bar-row"><span class="shap-label">Password + OTP fields</span><div class="shap-track"><div class="shap-fill" style="width:56%; background:var(--suspicious);"></div></div><span class="shap-val">+21</span></div>
+          <div class="shap-bar-row"><span class="shap-label">No HTTPS</span><div class="shap-track"><div class="shap-fill" style="width:26%; background:var(--suspicious);"></div></div><span class="shap-val">+10</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="wrap">
+      <div class="cta-box">
+        <span class="kicker">Get started</span>
+        <h2>Install ThreatLens in 10 seconds.</h2>
+        <p>Free, lightweight, and runs quietly in the background. You'll only hear from it when something's actually wrong.</p>
+        <button class="btn btn-primary" onclick="openInstallModal()" style="padding:14px 28px; font-size:15px;">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+          Add to Chrome — it's free
+        </button>
+        <div class="browser-chip">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/></svg>
+          Works with any Chromium browser · Manifest V3
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-row">
+      <div class="logo" style="font-size:15px;">
+        <svg class="logo-mark" width="18" height="18" viewBox="0 0 26 26" fill="none">
+          <circle cx="11" cy="11" r="7.5" stroke="#49D6C4" stroke-width="2"/>
+          <line x1="16.2" y1="16.2" x2="23" y2="23" stroke="#49D6C4" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        ThreatLens
+      </div>
+      <div class="footer-links">
+        <a href="#features">Features</a>
+        <a href="#pipeline">How it works</a>
+        <a href="#explain">Explainability</a>
+      </div>
+      <div class="footer-note">© 2026 ThreatLens. Not affiliated with Google or any brand it detects impersonation of.</div>
+    </div>
+  </div>
+</footer>
+
+<!-- INSTALL MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <button class="modal-close-x" onclick="closeInstallModal()" aria-label="Close">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+
+    <div class="modal-permstate" id="permState">
+      <div class="modal-icon">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7.5" stroke="currentColor" stroke-width="1.8"/><line x1="16.2" y1="16.2" x2="21" y2="21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </div>
+      <h3>Add "ThreatLens" to Chrome?</h3>
+      <p>It will be able to:</p>
+      <div class="perm-list">
+        <div class="perm-item"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12l6 6L20 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Read and analyze site content as pages load</div>
+        <div class="perm-item"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12l6 6L20 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Show warnings before risky navigation or downloads</div>
+        <div class="perm-item"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12l6 6L20 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Manage your scan history and settings</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeInstallModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="confirmInstall()">Add extension</button>
+      </div>
+    </div>
+
+    <div class="modal-success" id="successState">
+      <div class="modal-icon" style="background:rgba(62,216,143,.14); border-color:rgba(62,216,143,.35);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#3ED88F"><path d="M4 12l6 6L20 6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h3>ThreatLens is on guard.</h3>
+      <p>You're set — it'll scan sites, links, QR codes and downloads automatically from here on.<br><br><span style="color:var(--text-faint); font-size:12px;">Demo experience — the live Chrome Web Store listing is on its way.</span></p>
+      <button class="btn btn-primary" onclick="closeInstallModal()" style="width:100%; justify-content:center;">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS — STEP-BY-STEP WALKTHROUGH MODAL -->
+<div class="modal-overlay" id="howOverlay">
+  <div class="modal how-modal" id="howModal">
+    <button class="modal-close-x" onclick="closeHowModal()" aria-label="Close">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+
+    <div class="how-progress" id="howProgress"></div>
+
+    <div class="how-stage">
+      <div class="how-stage-content" id="howContent">
+        <span class="how-num" id="howNum">01 / 04</span>
+        <div class="how-icon" id="howIcon"></div>
+        <h3 id="howTitle"></h3>
+        <p id="howDesc"></p>
+      </div>
+    </div>
+
+    <div class="how-nav">
+      <button class="how-nav-btn" id="howBack" onclick="howGoTo(howStep - 1, true)">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Back
+      </button>
+      <div class="how-dots" id="howDots"></div>
+      <button class="how-nav-btn" id="howNext" onclick="howGoTo(howStep + 1, true)">
+        Next
+        <svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ---------- Nav mobile toggle (simple show/hide) ---------- */
+  document.querySelector('.nav-toggle').addEventListener('click', () => {
+    const links = document.querySelector('.nav-links');
+    const isOpen = links.style.display === 'flex';
+    links.style.display = isOpen ? 'none' : 'flex';
+    links.style.cssText += isOpen ? '' : 'position:absolute; top:64px; left:0; right:0; flex-direction:column; background:rgba(10,14,19,.98); padding:24px 20px; gap:18px; border-bottom:1px solid var(--border);';
+  });
+
+  /* ---------- Scan demo dataset ---------- */
+  const examples = [
+    { url:'paypa1-secure-login.com/verify', score:94, verdict:'DANGEROUS', reasons:[
+      'Look-alike of paypal.com (character substitution)',
+      'Domain registered 3 days ago',
+      'Password + OTP fields on a non-HTTPS page'
+    ]},
+    { url:'chase.com.account-verify.net', score:78, verdict:'HIGH RISK', reasons:[
+      'Suspicious subdomain structure mimicking a trusted brand',
+      'Urgent language detected: "account will be suspended"',
+      'No valid SSL certificate found'
+    ]},
+    { url:'mail-google-support.com', score:61, verdict:'SUSPICIOUS', reasons:[
+      'Brand keyword used in an unrelated domain',
+      'Redirect chain detected across 3 hops',
+      'Low domain reputation score'
+    ]},
+    { url:'github.com/anthropics/claude', score:4, verdict:'SAFE', reasons:[
+      'Domain matches trusted registry entry',
+      'Valid HTTPS certificate, 12-year history',
+      'No credential-harvesting indicators found'
+    ]}
+  ];
+
+  function verdictClass(v){
+    if (v === 'SAFE') return 'v-safe';
+    if (v === 'SUSPICIOUS') return 'v-suspicious';
+    if (v === 'HIGH RISK') return 'v-high';
+    return 'v-dangerous';
+  }
+
+  function heuristicScan(raw){
+    const url = raw.toLowerCase();
+    let score = 8;
+    const reasons = [];
+    if (!/^https:\/\//.test(raw) && !/^http:\/\//.test(raw)) score += 4;
+    if (url.includes('-')) { score += url.split('-').length * 4; }
+    if (/login|verify|secure|update|confirm|account/.test(url)) { score += 22; reasons.push('Contains urgency/credential-related keywords in the URL'); }
+    if (/\d/.test(url.replace(/\.(com|net|org|io)/,''))) { score += 10; reasons.push('Numeric characters substituted into a brand-like domain'); }
+    if ((url.match(/\./g) || []).length > 2) { score += 14; reasons.push('Unusual number of subdomains'); }
+    if (url.length > 40) { score += 8; reasons.push('Long, obfuscated-looking URL'); }
+    if (reasons.length === 0) reasons.push('No high-risk lexical patterns found in the URL structure');
+    reasons.push('Domain reputation lookup: no prior threat reports');
+    score = Math.max(2, Math.min(97, score));
+    let verdict = 'SAFE';
+    if (score >= 90) verdict = 'DANGEROUS';
+    else if (score >= 70) verdict = 'HIGH RISK';
+    else if (score >= 40) verdict = 'SUSPICIOUS';
+    return { url: raw, score, verdict, reasons: reasons.slice(0,3) };
+  }
+
+  function renderResult(data){
+    const placeholder = document.getElementById('scanPlaceholder');
+    const result = document.getElementById('result');
+    const line = document.getElementById('scanLine');
+
+    placeholder.style.display = 'none';
+    line.classList.remove('active');
+    void line.offsetWidth; // restart animation
+    line.classList.add('active');
+
+    setTimeout(() => {
+      result.className = 'result show ' + verdictClass(data.verdict);
+      document.getElementById('verdictBadge').textContent = data.verdict;
+
+      const reasonsList = document.getElementById('reasonsList');
+      reasonsList.innerHTML = '';
+      data.reasons.forEach(r => {
+        const div = document.createElement('div');
+        div.className = 'reason';
+        div.innerHTML = '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>' + r + '</span>';
+        reasonsList.appendChild(div);
+      });
+
+      // animate score count-up
+      const scoreEl = document.getElementById('scoreNum');
+      let cur = 0;
+      const target = data.score;
+      const step = Math.max(1, Math.round(target / 24));
+      const iv = setInterval(() => {
+        cur += step;
+        if (cur >= target){ cur = target; clearInterval(iv); }
+        scoreEl.textContent = cur;
+      }, 16);
+    }, 550);
+  }
+
+  function runScan(){
+    const input = document.getElementById('urlInput');
+    const val = input.value.trim();
+    if (!val) { input.focus(); return; }
+    const match = examples.find(e => val.toLowerCase().includes(e.url.split('/')[0]));
+    renderResult(match || heuristicScan(val));
+  }
+
+  function quickScan(i){
+    document.getElementById('urlInput').value = examples[i].url;
+    renderResult(examples[i]);
+  }
+
+  document.getElementById('urlInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') runScan();
+  });
+
+  /* ---------- Stat counters on scroll ---------- */
+  const counters = document.querySelectorAll('[data-count]');
+  const counterObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting){
+        const el = entry.target;
+        const target = parseInt(el.getAttribute('data-count'), 10);
+        const suffix = el.getAttribute('data-suffix') || '';
+        let cur = 0;
+        const step = Math.max(1, Math.round(target / 60));
+        const iv = setInterval(() => {
+          cur += step;
+          if (cur >= target){ cur = target; clearInterval(iv); }
+          el.textContent = cur.toLocaleString() + suffix;
+        }, 20);
+        counterObserver.unobserve(el);
+      }
+    });
+  }, { threshold: 0.4 });
+  counters.forEach(c => counterObserver.observe(c));
+
+  /* ---------- Install modal ---------- */
+  function openInstallModal(){
+    document.getElementById('permState').classList.remove('hide');
+    document.getElementById('successState').classList.remove('show');
+    document.getElementById('modalOverlay').classList.add('open');
+  }
+  function closeInstallModal(){
+    document.getElementById('modalOverlay').classList.remove('open');
+  }
+  function confirmInstall(){
+    document.getElementById('permState').classList.add('hide');
+    document.getElementById('successState').classList.add('show');
+  }
+  document.getElementById('modalOverlay').addEventListener('click', (e) => {
+    if (e.target.id === 'modalOverlay') closeInstallModal();
+  });
+
+  /* ---------- How-it-works walkthrough modal ---------- */
+  const howSteps = [
+    {
+      title: 'Capture',
+      desc: 'The moment a page loads, the extension reads the URL, the DOM structure, and any links, QR codes or downloads it contains — all locally, in the background.',
+      icon: '<svg viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M4 9h16" stroke="currentColor" stroke-width="1.8"/></svg>'
+    },
+    {
+      title: 'Analyze',
+      desc: 'An XGBoost model scores dozens of features — domain age, redirect chains, look-alike characters, form behavior — against live threat-intelligence and reputation data.',
+      icon: '<svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7.5" stroke="currentColor" stroke-width="1.8"/><line x1="16.2" y1="16.2" x2="21" y2="21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>'
+    },
+    {
+      title: 'Explain',
+      desc: 'SHAP attribution breaks the model\'s score down into the specific signals that drove it, then turns those into the plain-language reasons you actually read.',
+      icon: '<svg viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0l-4-4m4 4l4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>'
+    },
+    {
+      title: 'Act',
+      desc: 'Depending on the score, ThreatLens quietly allows the page, shows a warning, or blocks it outright — with an explicit "continue anyway" if you disagree with the call.',
+      icon: '<svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10V6l8-4z" stroke="currentColor" stroke-width="1.8"/></svg>'
+    }
+  ];
+
+  let howStep = 0;
+  let howTimer = null;
+  const HOW_DURATION = 3400;
+
+  function howBuildChrome(){
+    const progress = document.getElementById('howProgress');
+    const dots = document.getElementById('howDots');
+    progress.innerHTML = '';
+    dots.innerHTML = '';
+    howSteps.forEach((_, i) => {
+      const seg = document.createElement('div');
+      seg.className = 'how-seg';
+      seg.innerHTML = '<div class="how-seg-fill" id="howFill' + i + '"></div>';
+      progress.appendChild(seg);
+
+      const dot = document.createElement('button');
+      dot.className = 'how-dot';
+      dot.setAttribute('aria-label', 'Go to step ' + (i + 1));
+      dot.onclick = () => howGoTo(i, true);
+      dots.appendChild(dot);
+    });
+  }
+
+  function howRender(){
+    const s = howSteps[howStep];
+    const content = document.getElementById('howContent');
+    content.classList.remove('how-stage-content');
+    void content.offsetWidth;
+    content.classList.add('how-stage-content');
+
+    document.getElementById('howNum').textContent =
+      String(howStep + 1).padStart(2, '0') + ' / ' + String(howSteps.length).padStart(2, '0');
+    document.getElementById('howIcon').innerHTML = s.icon;
+    document.getElementById('howTitle').textContent = s.title;
+    document.getElementById('howDesc').textContent = s.desc;
+
+    document.getElementById('howBack').disabled = howStep === 0;
+    const nextBtn = document.getElementById('howNext');
+    nextBtn.innerHTML = howStep === howSteps.length - 1
+      ? 'Restart <svg viewBox="0 0 24 24" fill="none"><path d="M4 4v6h6M20 20v-6h-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 15a7 7 0 0013-3M18.5 9a7 7 0 00-13 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>'
+      : 'Next <svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+    document.querySelectorAll('.how-dot').forEach((d, i) => d.classList.toggle('active', i === howStep));
+
+    howSteps.forEach((_, i) => {
+      const fill = document.getElementById('howFill' + i);
+      fill.classList.remove('animating');
+      fill.style.transition = 'none';
+      if (i < howStep) { fill.classList.add('filled'); fill.style.width = '100%'; }
+      else { fill.classList.remove('filled'); fill.style.width = '0%'; }
+    });
+  }
+
+  function howStartFill(){
+    const fill = document.getElementById('howFill' + howStep);
+    fill.style.transition = 'none';
+    fill.style.width = '0%';
+    void fill.offsetWidth;
+    fill.classList.add('animating');
+    fill.style.transitionDuration = HOW_DURATION + 'ms';
+    fill.style.width = '100%';
+  }
+
+  function howGoTo(i, manual){
+    if (i >= howSteps.length){ i = 0; }
+    if (i < 0){ return; }
+    howStep = i;
+    howRender();
+    howStartFill();
+    howResetTimer();
+  }
+
+  function howResetTimer(){
+    clearTimeout(howTimer);
+    howTimer = setTimeout(() => howGoTo(howStep + 1, false), HOW_DURATION);
+  }
+
+  function openHowModal(){
+    howBuildChrome();
+    howStep = 0;
+    howRender();
+    howStartFill();
+    document.getElementById('howOverlay').classList.add('open');
+    howResetTimer();
+  }
+
+  function closeHowModal(){
+    document.getElementById('howOverlay').classList.remove('open');
+    clearTimeout(howTimer);
+  }
+
+  document.getElementById('howModal').addEventListener('mouseenter', () => {
+    clearTimeout(howTimer);
+    const fill = document.getElementById('howFill' + howStep);
+    if (fill){
+      const cs = getComputedStyle(fill);
+      fill.style.transition = 'none';
+      fill.style.width = cs.width; // freeze at current progress
+    }
+  });
+  document.getElementById('howModal').addEventListener('mouseleave', () => {
+    if (document.getElementById('howOverlay').classList.contains('open')) {
+      howStartFill();
+      howResetTimer();
+    }
+  });
+
+  document.getElementById('howOverlay').addEventListener('click', (e) => {
+    if (e.target.id === 'howOverlay') closeHowModal();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape'){ closeInstallModal(); closeHowModal(); }
+    if (document.getElementById('howOverlay').classList.contains('open')){
+      if (e.key === 'ArrowRight') howGoTo(howStep + 1, true);
+      if (e.key === 'ArrowLeft') howGoTo(howStep - 1, true);
+    }
+  });
+</script>
+
+</body>
+</html>
