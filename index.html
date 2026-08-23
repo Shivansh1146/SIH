@@ -90,22 +90,22 @@
   }
   .logo{
     display:flex; align-items:center; gap:10px;
-    font-family:var(--font-display); font-weight:600; font-size:19px;
+    font-family:var(--font-display); font-weight:400; font-size:19px;
     letter-spacing:.01em;
   }
   .logo-mark{ width:26px; height:26px; flex-shrink:0; }
   .nav-links{ display:flex; gap:36px; align-items:center; }
   .nav-links a{
-    font-size:14.5px; color:var(--text-dim); transition:color .2s ease;
+    font-size:14.5px; font-weight:700; color:var(--accent); transition:opacity .2s ease;
     position:relative;
   }
-  .nav-links a:hover{ color:var(--text); }
+  .nav-links a:hover{ opacity:.75; }
   .nav-cta{ display:flex; align-items:center; gap:14px; }
   .nav-toggle{ display:none; background:none; border:none; color:var(--text); }
 
   .btn{
     font-family:var(--font-display);
-    font-weight:600;
+    font-weight:400;
     font-size:14.5px;
     padding:11px 20px;
     border-radius:8px;
@@ -154,7 +154,7 @@
   }
   h1{
     font-family:var(--font-display);
-    font-weight:600;
+    font-weight:400;
     font-size:clamp(38px, 4.6vw, 60px);
     line-height:1.04;
     letter-spacing:-.01em;
@@ -286,7 +286,7 @@
     gap:12px; flex-wrap:wrap;
   }
   .verdict-badge{
-    font-family:var(--font-display); font-weight:600; font-size:13px;
+    font-family:var(--font-display); font-weight:400; font-size:13px;
     padding:6px 12px; border-radius:6px;
     letter-spacing:.03em;
   }
@@ -333,7 +333,7 @@
   }
   .stat{ text-align:left; }
   .stat .num{
-    font-family:var(--font-display); font-weight:600;
+    font-family:var(--font-display); font-weight:400;
     font-size:clamp(26px,3vw,36px);
     color:var(--text);
   }
@@ -348,7 +348,7 @@
     text-transform:uppercase; letter-spacing:.08em; margin-bottom:14px; display:block;
   }
   h2{
-    font-family:var(--font-display); font-weight:600;
+    font-family:var(--font-display); font-weight:400;
     font-size:clamp(28px,3.4vw,40px);
     letter-spacing:-.01em;
     line-height:1.15;
@@ -379,7 +379,7 @@
   }
   .feature-icon svg{ width:18px; height:18px; color:var(--accent); }
   .feature h3{
-    font-family:var(--font-display); font-weight:600; font-size:16.5px; margin-bottom:9px;
+    font-family:var(--font-display); font-weight:400; font-size:16.5px; margin-bottom:9px;
   }
   .feature p{ font-size:14px; color:var(--text-dim); line-height:1.65; }
 
@@ -400,7 +400,7 @@
     margin-bottom:14px; display:block;
   }
   .pipe-step h4{
-    font-family:var(--font-display); font-size:15.5px; font-weight:600; margin-bottom:8px;
+    font-family:var(--font-display); font-size:15.5px; font-weight:400; margin-bottom:8px;
   }
   .pipe-step p{ font-size:13px; color:var(--text-dim); line-height:1.6; }
   .pipe-arrow{
@@ -423,7 +423,7 @@
     font-family:var(--font-mono); font-size:12px; color:var(--accent);
     width:24px; flex-shrink:0; padding-top:2px;
   }
-  .explain-item h4{ font-family:var(--font-display); font-size:15px; font-weight:600; margin-bottom:5px; }
+  .explain-item h4{ font-family:var(--font-display); font-size:15px; font-weight:400; margin-bottom:5px; }
   .explain-item p{ font-size:13.5px; color:var(--text-dim); line-height:1.6; }
 
   .mock-card{
@@ -491,7 +491,7 @@
     display:flex; align-items:center; justify-content:center; margin-bottom:18px;
   }
   .modal-icon svg{ width:24px; height:24px; color:var(--accent); }
-  .modal h3{ font-family:var(--font-display); font-size:18px; font-weight:600; margin-bottom:8px; }
+  .modal h3{ font-family:var(--font-display); font-size:18px; font-weight:400; margin-bottom:8px; }
   .modal p{ font-size:13.5px; color:var(--text-dim); line-height:1.6; margin-bottom:20px; }
   .perm-list{ display:flex; flex-direction:column; gap:10px; margin-bottom:22px; }
   .perm-item{ display:flex; gap:10px; align-items:flex-start; font-size:13px; color:var(--text-dim); }
@@ -533,7 +533,7 @@
     margin-bottom:20px;
   }
   .how-icon svg{ width:24px; height:24px; color:var(--accent); }
-  .how-stage h3{ font-family:var(--font-display); font-weight:600; font-size:21px; margin-bottom:10px; }
+  .how-stage h3{ font-family:var(--font-display); font-weight:400; font-size:21px; margin-bottom:10px; }
   .how-stage p{ font-size:14.5px; color:var(--text-dim); line-height:1.7; }
   .how-stage-content{ animation:fadeUp .35s ease; }
 
@@ -555,6 +555,26 @@
   .how-nav-btn:hover{ color:var(--text); }
   .how-nav-btn:disabled{ opacity:.35; pointer-events:none; }
   .how-nav-btn svg{ width:15px; height:15px; }
+
+  /* ---------- SCROLL REVEAL ---------- */
+  .reveal{
+    opacity:0;
+    transform:translateY(48px);
+    transition:opacity .8s cubic-bezier(.2,.7,.3,1), transform .8s cubic-bezier(.2,.7,.3,1);
+    will-change:opacity, transform;
+  }
+  .reveal.visible{ opacity:1; transform:translateY(0); }
+  .feature-grid .feature.reveal:nth-child(2){ transition-delay:.08s; }
+  .feature-grid .feature.reveal:nth-child(3){ transition-delay:.16s; }
+  .feature-grid .feature.reveal:nth-child(4){ transition-delay:.24s; }
+  .feature-grid .feature.reveal:nth-child(5){ transition-delay:.32s; }
+  .feature-grid .feature.reveal:nth-child(6){ transition-delay:.4s; }
+  .pipeline .pipe-step.reveal:nth-child(3){ transition-delay:.1s; }
+  .pipeline .pipe-step.reveal:nth-child(5){ transition-delay:.2s; }
+  .pipeline .pipe-step.reveal:nth-child(7){ transition-delay:.3s; }
+  .stats-row .stat.reveal:nth-child(2){ transition-delay:.08s; }
+  .stats-row .stat.reveal:nth-child(3){ transition-delay:.16s; }
+  .stats-row .stat.reveal:nth-child(4){ transition-delay:.24s; }
 
   /* ---------- RESPONSIVE ---------- */
   @media (max-width:900px){
@@ -1049,6 +1069,21 @@
   document.getElementById('modalOverlay').addEventListener('click', (e) => {
     if (e.target.id === 'modalOverlay') closeInstallModal();
   });
+
+  /* ---------- Scroll reveal ---------- */
+  const revealTargets = document.querySelectorAll(
+    '.section-head, .feature, .pipe-step, .mock-card, .explain-list, .cta-box, .stats-row .stat'
+  );
+  revealTargets.forEach(el => el.classList.add('reveal'));
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+  revealTargets.forEach(el => revealObserver.observe(el));
 
   /* ---------- How-it-works walkthrough modal ---------- */
   const howSteps = [
