@@ -62,7 +62,7 @@ User Input (URL)
          ▼
 ┌─────────────────┐
 │ RandomForest    │  backend/model/phishing_model.joblib
-│ Classifier      │  200 trees, class_weight=balanced
+│ Classifier      │  50 trees, class_weight=balanced
 └────────┬────────┘
          │
          ▼
@@ -125,7 +125,7 @@ User Input (URL)
 
 ### Algorithm
 **Random Forest Classifier**
-- 200 decision trees
+- 50 decision trees
 - `class_weight="balanced"` — handles class imbalance
 - `random_state=42` — fully reproducible
 - `max_features="sqrt"` — prevents overfitting
@@ -139,10 +139,10 @@ User Input (URL)
 
 | Metric | Score |
 |---|---|
-| Accuracy | **89.03%** |
-| Precision | **89.06%** |
-| Recall | **89.00%** |
-| F1-Score | **89.03%** |
+| Accuracy | **88.54%** |
+| Precision | **88.79%** |
+| Recall | **88.22%** |
+| F1-Score | **88.50%** |
 | Test set size | 12,000 URLs |
 
 ### Top Feature Importances (Real values from trained model)
@@ -246,9 +246,9 @@ TLD Analysis:        suspicious_tld
 | Layer | Technology |
 |---|---|
 | Frontend | Vanilla HTML5 / CSS3 / JavaScript |
-| Backend | Python 3.13 + Flask 3.0 + Gunicorn |
-| ML | scikit-learn 1.6 (RandomForestClassifier) |
-| Data | pandas, numpy, joblib |
+| Backend | Python 3.14 + Flask 3.0 + Built-in WSGI |
+| ML | scikit-learn 1.9 (RandomForestClassifier) |
+| Data | numpy, joblib (pandas/scipy used only for training) |
 | Testing | pytest (135 tests) |
 | Extension | Chrome Extension Manifest V3 |
 | Frontend Hosting | Netlify |
@@ -344,12 +344,11 @@ pytest tests/ -v
 - **URL:** https://sih-l2l2.onrender.com
 - Deployed from the `backend/` root directory
 - Config: `render.yaml`
-- Start command: `gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120`
+- Start command: `python app.py` (Memory optimized for 512MB RAM tier)
+- Dependencies: `requirements-prod.txt` (Excludes heavy training libraries like Pandas/SciPy)
 - Env vars: `FRONTEND_ORIGIN=https://threatlens-shield.netlify.app`
 
 > ⚠️ **Render Free Tier:** The service spins down after inactivity. The first request after idle may take 50–60 seconds to respond. Subsequent requests are fast.
-
-> ⚠️ **Model file:** The trained `.joblib` model is excluded from Git (large file). For Render deployment, the model must be retrained or hosted separately.
 
 ---
 
@@ -373,7 +372,6 @@ pytest tests/ -v
 2. **Short domain bias:** The training dataset causes the model to give higher risk scores to very short URLs (e.g., `github.com`). This is a known dataset artifact, not a code bug
 3. **Lexical only:** All 34 features are extracted from the URL string. No DOM analysis, no WHOIS, no live threat intelligence
 4. **Extension requires local backend:** The extension currently needs the Flask server running locally
-5. **Model not in Git:** The `.joblib` model file is excluded from version control — must be trained locally
 
 ---
 
@@ -393,15 +391,16 @@ phishing_3/
 │   └── styles.css
 └── backend/
     ├── app.py                    # Flask application factory
-    ├── requirements.txt
-    ├── Procfile                  # Gunicorn start command
+    ├── requirements.txt          # Full dev requirements
+    ├── requirements-prod.txt     # Lean prod requirements
+    ├── Procfile                  # Start command
     ├── .env.example              # Environment variable template
     ├── ml/
     │   ├── feature_extractor.py  # 34-feature URL analysis engine
     │   ├── train_model.py        # Training pipeline
     │   └── explain.py            # Risk engine + explainability
     ├── model/
-    │   ├── phishing_model.joblib # Trained model (git-ignored)
+    │   ├── phishing_model.joblib # Trained model (9MB, committed)
     │   └── feature_metadata.json # Training provenance + metrics
     └── tests/
         ├── test_api.py           # 22 API endpoint tests
