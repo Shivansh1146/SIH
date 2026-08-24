@@ -370,7 +370,7 @@ pytest tests/ -v
 | 4 | Read reasons | "No HTTPS", "Brand impersonation", "Credential keywords" |
 | 5 | Read explainability | Feature importances: url_entropy, path_length |
 | 6 | Load extension → browse to GitHub | Popup shows low risk, badge shows ✓ |
-| 7 | Navigate to a suspicious URL | Full-page overlay: ⚠ PHISHGUARD AI WARNING |
+| 7 | Navigate to a suspicious URL | Full-page overlay: ⚠ THREATLENS-SHIELD WARNING |
 
 ---
 

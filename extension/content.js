@@ -84,7 +84,7 @@ function injectWarningOverlay(data) {
                 <div style="width: 64px; height: 64px; background: rgba(${isDangerous ? '208,2,27' : '255,75,75'},0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;">
                     <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="${accentColor}" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                 </div>
-                <h1 style="font-size: 20px; letter-spacing: 1px; color: ${accentColor}; margin: 0 0 8px 0; text-transform: uppercase;">⚠ PHISHGUARD AI WARNING</h1>
+                <h1 style="font-size: 20px; letter-spacing: 1px; color: ${accentColor}; margin: 0 0 8px 0; text-transform: uppercase;">⚠ THREATLENS-SHIELD WARNING</h1>
                 <p style="font-size: 18px; margin: 0 0 24px 0;">${subtitle}</p>
                 
                 <div style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 32px;">
