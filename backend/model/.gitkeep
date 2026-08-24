@@ -1,0 +1,4 @@
+# model directory placeholder
+# Trained model artifacts (.joblib, .pkl) go here.
+# They are intentionally excluded from git via .gitignore.
+# To obtain a model file, run the training script in Phase 3.

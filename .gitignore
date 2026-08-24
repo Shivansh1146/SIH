@@ -1,0 +1,78 @@
+# ============================================================
+# ThreatLens — .gitignore
+# ============================================================
+
+# ── Python ───────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+venv/
+env/
+.env/
+.venv/
+
+# Environment variables (NEVER commit secrets)
+.env
+.env.local
+.env.*.local
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+MANIFEST
+
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+*.log
+
+# ── ML Model files (often large / proprietary) ───────────────
+backend/model/*.joblib
+backend/model/*.pkl
+backend/model/*.h5
+backend/model/*.pt
+backend/model/*.onnx
+
+# ── Large datasets ───────────────────────────────────────────
+backend/data/*.csv
+backend/data/*.parquet
+backend/data/*.json
+# Exception: keep placeholder / sample files
+!backend/data/.gitkeep
+!backend/data/sample_*.csv
+
+# ── Node (if a frontend build step is added later) ───────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp/
+.pnp.js
+
+# ── OS / Editor ──────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+*.code-workspace
+
+# ── Jupyter ──────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ── Misc ─────────────────────────────────────────────────────
+*.zip
+*.tar.gz

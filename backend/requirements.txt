@@ -1,0 +1,24 @@
+# ThreatLens — Backend Dependencies
+# ==================================
+# Only include packages that are ACTUALLY used.
+# Add new packages as each phase requires them.
+#
+# Install with:
+#   pip install -r requirements.txt
+
+# Core web framework
+flask==3.0.3
+flask-cors==4.0.1
+
+# Data & ML (installed now so the environment is ready for Phase 2/3)
+scikit-learn==1.5.1
+pandas==2.2.2
+numpy==1.26.4
+joblib==1.4.2
+
+# NOTE — not included yet (add in the phase that actually uses them):
+#   xgboost         — Phase 3 (model training)
+#   shap            — Phase 5 (explainability)
+#   requests        — Phase 4 (live threat intelligence lookups)
+#   python-whois    — Phase 2 (domain-age feature extraction)
+#   tldextract      — Phase 2 (URL parsing)

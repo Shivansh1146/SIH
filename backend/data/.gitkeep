@@ -1,0 +1,4 @@
+# data directory placeholder
+# Raw datasets and processed feature CSVs go here.
+# Large files (*.csv, *.parquet) are excluded from git via .gitignore.
+# Sample files (sample_*.csv) ARE committed for reference.
