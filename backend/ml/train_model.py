@@ -225,7 +225,7 @@ def train_model(X_train: np.ndarray, y_train: np.ndarray) -> RandomForestClassif
         "n_estimators=200  class_weight=balanced  n_jobs=-1…"
     )
     clf = RandomForestClassifier(
-        n_estimators=200,
+        n_estimators=50,
         random_state=42,
         class_weight="balanced",
         max_features="sqrt",
@@ -322,7 +322,7 @@ def save_artifacts(
         "training_date": datetime.now(timezone.utc).isoformat(),
         "algorithm":     "RandomForestClassifier",
         "hyperparameters": {
-            "n_estimators": 200,
+            "n_estimators": 50,
             "random_state": 42,
             "class_weight": "balanced",
             "max_features": "sqrt",
@@ -407,7 +407,7 @@ def main() -> None:
     print("=" * 60)
     print(f"  Feature count   : {len(FEATURE_NAMES)}")
     print(f"  Sample cap      : {SAMPLE_SIZE if SAMPLE_SIZE else 'full dataset'}")
-    print(f"  Model algorithm : RandomForestClassifier(n_estimators=200)")
+    print(f"  Model algorithm : RandomForestClassifier(n_estimators=50)")
     print("=" * 60)
     print()
 

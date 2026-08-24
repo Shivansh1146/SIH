@@ -2,10 +2,10 @@
   "model_name": "ThreatLens Phishing URL Classifier",
   "model_version": "1.0.0",
   "phase": 4,
-  "training_date": "2026-08-24T14:26:09.175180+00:00",
+  "training_date": "2026-08-24T16:25:54.540347+00:00",
   "algorithm": "RandomForestClassifier",
   "hyperparameters": {
-    "n_estimators": 200,
+    "n_estimators": 50,
     "random_state": 42,
     "class_weight": "balanced",
     "max_features": "sqrt"
@@ -58,18 +58,18 @@
     "sample_cap": 60000
   },
   "metrics": {
-    "accuracy": 0.890333,
-    "precision": 0.890594,
-    "recall": 0.89,
-    "f1_score": 0.890297,
+    "accuracy": 0.885417,
+    "precision": 0.887938,
+    "recall": 0.882167,
+    "f1_score": 0.885043,
     "confusion_matrix": [
       [
-        5344,
-        656
+        5332,
+        668
       ],
       [
-        660,
-        5340
+        707,
+        5293
       ]
     ],
     "test_set_size": 12000,
@@ -79,52 +79,52 @@
       {
         "rank": 1,
         "name": "url_entropy",
-        "importance": 0.128443
+        "importance": 0.127006
       },
       {
         "rank": 2,
         "name": "path_length",
-        "importance": 0.11934
+        "importance": 0.121241
       },
       {
         "rank": 3,
         "name": "hostname_entropy",
-        "importance": 0.105838
+        "importance": 0.106489
       },
       {
         "rank": 4,
         "name": "num_digits",
-        "importance": 0.0986
+        "importance": 0.098147
       },
       {
         "rank": 5,
         "name": "url_length",
-        "importance": 0.092443
+        "importance": 0.092352
       },
       {
         "rank": 6,
         "name": "url_depth",
-        "importance": 0.077557
+        "importance": 0.076657
       },
       {
         "rank": 7,
         "name": "hostname_length",
-        "importance": 0.075561
+        "importance": 0.075887
       },
       {
         "rank": 8,
         "name": "num_hyphens",
-        "importance": 0.069266
+        "importance": 0.06834
       },
       {
         "rank": 9,
         "name": "num_dots",
-        "importance": 0.057024
+        "importance": 0.054271
       },
       {
         "rank": 10,
         "name": "suspicious_keyword_count",
-        "importance": 0.032236
+        "importance": 0.031929
       }
     ]
   },
