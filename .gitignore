@@ -37,8 +37,9 @@ coverage.xml
 *.cover
 *.log
 
-# ── ML Model files (often large / proprietary) ───────────────
-backend/model/*.joblib
+# ── ML Model files ──────────────────────────────────────────────────────────
+# The trained phishing_model.joblib is committed (36 MB, under GitHub 100 MB limit).
+# Large proprietary/experimental models should still be excluded:
 backend/model/*.pkl
 backend/model/*.h5
 backend/model/*.pt
