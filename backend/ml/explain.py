@@ -40,7 +40,9 @@ def load_model():
     if _clf is None:
         if not MODEL_FILE.exists():
             raise FileNotFoundError(f"Model file not found: {MODEL_FILE}. Run Phase 4 training.")
-        _clf = joblib.load(MODEL_FILE)
+        # mmap_mode='r' maps large numpy arrays to disk instead of RAM,
+        # which is critical for fitting the 36MB Random Forest into Render's 512MB RAM tier.
+        _clf = joblib.load(MODEL_FILE, mmap_mode='r')
     
     if _meta is None:
         if not META_FILE.exists():
