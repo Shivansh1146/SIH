@@ -50,7 +50,6 @@ def create_app() -> Flask:
         "http://127.0.0.1:5500",
         "https://threatlens-shield.netlify.app",
         "https://threatlens-shield1.netlify.app",  # legacy
-        "https://shivansh1146.github.io",           # GitHub Pages
     ]
     env_origins = os.environ.get("FRONTEND_ORIGIN", "")
     allowed_origins = (
