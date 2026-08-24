@@ -1,91 +1,202 @@
 """
 ThreatLens — Backend API
 ========================
-Phase 1: Foundation scaffold only.
+Phase 2: Working Flask API with proper URL validation, CORS, and error handling.
 
-This file defines the Flask application skeleton with a /ping health-check
-and a /scan endpoint stub.  No ML model is loaded in Phase 1.
+Endpoints
+---------
+  GET  /api/health   — liveness probe
+  POST /api/scan     — phishing-risk assessment (MODEL_NOT_CONNECTED until Phase 3)
 
-Phase 2 will wire in:
-  - Feature extraction  (backend/ml/feature_extractor.py)
-  - ML model inference  (backend/ml/predictor.py)
-  - SHAP explainability (backend/ml/explainer.py)
+Environment variables
+---------------------
+  FRONTEND_ORIGIN   Comma-separated list of allowed CORS origins.
+                    Defaults to localhost + the live Netlify URL.
+                    Example: FRONTEND_ORIGIN=https://threatlens1.netlify.app,http://localhost:3000
+
+  FLASK_ENV         Set to "development" for debug mode (never set in production).
 """
+
+import os
+import logging
+from urllib.parse import urlparse
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
-app = Flask(__name__)
-CORS(app)  # allow the frontend (Netlify) to call this API during development
+
+# ---------------------------------------------------------------------------
+# Application factory
+# ---------------------------------------------------------------------------
+
+def create_app() -> Flask:
+    """Create and configure the Flask application."""
+    app = Flask(__name__)
+
+    # ── Logging ──────────────────────────────────────────────────────────────
+    logging.basicConfig(
+        level=logging.INFO,
+        format="[%(asctime)s] %(levelname)s %(name)s: %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+    log = logging.getLogger(__name__)
+
+    # ── CORS ─────────────────────────────────────────────────────────────────
+    # Origins are configurable via the FRONTEND_ORIGIN env var so we never
+    # hardcode the Netlify URL in source code.
+    default_origins = [
+        "http://localhost:3000",
+        "http://localhost:5500",
+        "http://127.0.0.1:5500",
+        "https://threatlens1.netlify.app",
+    ]
+    env_origins = os.environ.get("FRONTEND_ORIGIN", "")
+    allowed_origins = (
+        [o.strip() for o in env_origins.split(",") if o.strip()]
+        if env_origins
+        else default_origins
+    )
+    log.info("CORS allowed origins: %s", allowed_origins)
+
+    CORS(
+        app,
+        resources={r"/api/*": {"origins": allowed_origins}},
+        methods=["GET", "POST", "OPTIONS"],
+        allow_headers=["Content-Type", "Authorization"],
+    )
+
+    # ── Helpers ───────────────────────────────────────────────────────────────
+
+    def _json_error(message: str, status: int = 400):
+        """Return a consistent JSON error response."""
+        return jsonify({"success": False, "error": message}), status
+
+    def _validate_url(raw: str):
+        """
+        Validate that *raw* is a well-formed HTTP/HTTPS URL.
+
+        Returns (cleaned_url, None) on success.
+        Returns (None, error_message)  on failure.
+        """
+        if not isinstance(raw, str):
+            return None, "URL must be a string."
+
+        if not raw or not raw.strip():
+            return None, "URL must not be empty."
+
+        url = raw.strip()
+
+        # Prepend https:// if user omitted the scheme (common for bare domains)
+        if not url.startswith(("http://", "https://")):
+            url = "https://" + url
+
+        try:
+            parsed = urlparse(url)
+        except Exception:
+            return None, "URL could not be parsed."
+
+        if parsed.scheme not in ("http", "https"):
+            return None, "Only http:// and https:// URLs are supported."
+
+        # Must have a netloc (domain)
+        if not parsed.netloc:
+            return None, "URL is missing a domain."
+
+        # Basic domain sanity check — must contain at least one dot
+        hostname = parsed.hostname or ""
+        if "." not in hostname:
+            return None, "URL does not contain a valid domain."
+
+        return url, None
+
+    # ── Routes ────────────────────────────────────────────────────────────────
+
+    @app.route("/api/health", methods=["GET"])
+    def health():
+        """
+        Liveness probe.
+
+        Response 200:
+            { "status": "ok", "service": "ThreatLens API" }
+        """
+        return jsonify({"status": "ok", "service": "ThreatLens API"}), 200
+
+    @app.route("/api/scan", methods=["POST"])
+    def scan():
+        """
+        Submit a URL for phishing-risk analysis.
+
+        Request body (JSON):
+            { "url": "https://example.com" }
+
+        Response 200 — MODEL_NOT_CONNECTED (Phase 2):
+            {
+                "success": true,
+                "url":     "https://example.com",
+                "status":  "MODEL_NOT_CONNECTED",
+                "message": "Backend API is working. ML pipeline will be connected in a later phase."
+            }
+
+        Response 400 — invalid URL:
+            { "success": false, "error": "..." }
+        """
+        # ── Parse request ──────────────────────────────────────────────────
+        body = request.get_json(silent=True)
+
+        if body is None:
+            return _json_error(
+                "Request body must be valid JSON with Content-Type: application/json."
+            )
+
+        if "url" not in body:
+            return _json_error("Missing required field: 'url'.")
+
+        # ── Validate URL ───────────────────────────────────────────────────
+        url, err = _validate_url(body["url"])
+        if err:
+            return _json_error(f"Invalid URL — {err}")
+
+        # ── Scan (Phase 2: stub response — no ML yet) ──────────────────────
+        log.info("Scan requested for URL: %s", url)
+
+        return jsonify({
+            "success": True,
+            "url":     url,
+            "status":  "MODEL_NOT_CONNECTED",
+            "message": (
+                "Backend API is working. "
+                "ML pipeline will be connected in a later phase."
+            ),
+        }), 200
+
+    # ── Global error handlers ─────────────────────────────────────────────────
+
+    @app.errorhandler(404)
+    def not_found(exc):                         # noqa: F841
+        return _json_error("Endpoint not found.", 404)
+
+    @app.errorhandler(405)
+    def method_not_allowed(exc):                # noqa: F841
+        return _json_error("Method not allowed on this endpoint.", 405)
+
+    @app.errorhandler(Exception)
+    def unhandled(exc):                         # noqa: F841
+        """
+        Catch-all handler — never expose the stack trace to the client.
+        The full traceback is written to the server log only.
+        """
+        log.exception("Unhandled exception: %s", exc)
+        return _json_error("An unexpected server error occurred.", 500)
+
+    return app
 
 
 # ---------------------------------------------------------------------------
-# Health check
+# Entry point
 # ---------------------------------------------------------------------------
 
-@app.route("/ping", methods=["GET"])
-def ping():
-    """Simple liveness probe — used by the frontend to verify API is reachable."""
-    return jsonify({"status": "ok", "service": "ThreatLens API", "phase": 1})
-
-
-# ---------------------------------------------------------------------------
-# Scan endpoint (STUB — Phase 1)
-# ---------------------------------------------------------------------------
-
-@app.route("/scan", methods=["POST"])
-def scan():
-    """
-    Accepts a URL and returns a phishing-risk assessment.
-
-    Phase 1 status: STUB — returns a placeholder response.
-    Phase 2 will replace this with real feature extraction + ML inference.
-
-    Expected request body (JSON):
-        { "url": "https://example.com" }
-
-    Response (JSON):
-        {
-            "url":     str,
-            "score":   int,          # 0–100 risk score
-            "verdict": str,          # SAFE | SUSPICIOUS | HIGH RISK | DANGEROUS
-            "reasons": list[str],    # plain-language explanations
-            "phase":   int           # which implementation phase produced this
-        }
-    """
-    data = request.get_json(silent=True)
-
-    if not data or "url" not in data:
-        return jsonify({"error": "Missing 'url' in request body"}), 400
-
-    url = data["url"].strip()
-
-    if not url:
-        return jsonify({"error": "'url' must not be empty"}), 400
-
-    # -----------------------------------------------------------------------
-    # Phase 1 stub response
-    # The real implementation (feature extraction + XGBoost + SHAP) will be
-    # wired in Phase 2.  We return an explicit stub so the caller knows the
-    # API is reachable but not yet functional.
-    # -----------------------------------------------------------------------
-    return jsonify({
-        "url":     url,
-        "score":   None,
-        "verdict": "STUB",
-        "reasons": [
-            "Phase 1 scaffold — ML model not yet trained or loaded.",
-            "Feature extraction pipeline not yet implemented.",
-            "SHAP explainability not yet implemented."
-        ],
-        "phase": 1
-    }), 200
-
-
-# ---------------------------------------------------------------------------
-# Run
-# ---------------------------------------------------------------------------
+app = create_app()
 
 if __name__ == "__main__":
-    # debug=True is fine for local development; never use in production
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    debug = os.environ.get("FLASK_ENV", "production") == "development"
+    app.run(host="0.0.0.0", port=5000, debug=debug)
