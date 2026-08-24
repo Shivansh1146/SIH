@@ -67,6 +67,7 @@ BRANDS: tuple[str, ...] = (
     "facebook", "instagram", "github",
     "sbi", "hdfc", "icici", "axis",
     "upi", "phonepe", "paytm", "aadhaar", "irctc",
+    "claude", "chatgpt", "openai", "netlify", "render",
 )
 
 # Suspicious TLDs that are disproportionately used in phishing campaigns
