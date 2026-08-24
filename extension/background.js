@@ -1,9 +1,7 @@
 // extension/background.js
 
-// API URL for production: https://sih-l2l2.onrender.com/api/scan
-// For local dev: http://127.0.0.1:5000/api/scan
-// To switch to production, change the URL below:
-const API_URL = "http://127.0.0.1:5000/api/scan";
+// Production API — points to the live Render backend
+const API_URL = "https://sih-l2l2.onrender.com/api/scan";
 
 // Cache for scan results per tab
 let tabResults = {};
