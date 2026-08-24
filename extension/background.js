@@ -61,11 +61,12 @@ async function scanUrl(url, tabId, domData) {
             // Update the extension badge
             updateBadge(tabId, result.verdict);
             
-            // Send back to popup if it's open
-            chrome.runtime.sendMessage({ action: 'SCAN_COMPLETE', tabId: tabId, result: result });
+            // Notify popup if it's open (safe: ignore error if popup is closed)
+            chrome.runtime.sendMessage({ action: 'SCAN_COMPLETE', tabId: tabId, result: result })
+                .catch(() => {});
             
             // Send to content script for potential prevention overlay
-            chrome.tabs.sendMessage(tabId, { action: 'SHOW_PREVENTION', result: result }).catch(e => {});
+            chrome.tabs.sendMessage(tabId, { action: 'SHOW_PREVENTION', result: result }).catch(() => {});
         }
     } catch (err) {
         console.error("ThreatLens Scan Failed:", err);
