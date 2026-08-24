@@ -77,3 +77,6 @@ Thumbs.db
 # ── Misc ─────────────────────────────────────────────────────
 *.zip
 *.tar.gz
+
+# Local Netlify folder
+.netlify

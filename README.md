@@ -2,7 +2,7 @@
 ### Real-Time AI/ML-Based Phishing Detection and Prevention System
 **SIH 2026 — Problem Statement #100**
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-threatlens-shield--shield.netlify.app-teal?style=flat-square)](https://threatlens-shield.netlify.app)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-threatlens--shield.netlify.app-teal?style=flat-square)](https://threatlens-shield.netlify.app)
 [![Backend API](https://img.shields.io/badge/API-sih--l2l2.onrender.com-purple?style=flat-square)](https://sih-l2l2.onrender.com/api/health)
 [![Tests](https://img.shields.io/badge/Tests-135%20passed-green?style=flat-square)](#testing)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE)
@@ -386,7 +386,7 @@ pytest tests/ -v
 ## 📁 Project Structure
 
 ```
-phishing_3/
+ThreatLens-Shield/
 ├── index.html                    # Frontend (single-page)
 ├── netlify.toml                  # Netlify config
 ├── render.yaml                   # Render deployment config
