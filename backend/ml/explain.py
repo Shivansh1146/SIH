@@ -149,6 +149,14 @@ def analyze_url(url: str) -> dict[str, Any]:
     # Calculate 0-100 Risk Score
     risk_score = int(round(prob_phish * 100))
     
+    # ── HEURISTIC OVERRIDE: Protect Legitimate Brands ────────────────────────
+    # The ML model has a known bias against very short domains (e.g. google.com).
+    # If the feature extractor confidently identified a legitimate brand domain,
+    # we force the risk score to remain SAFE.
+    if res.features.get("brand_keyword_count", 0) > 0 and res.features.get("brand_impersonation_indicator", 0) == 0:
+        risk_score = min(risk_score, 15)  # Cap at 15
+        prob_phish = risk_score / 100.0
+    
     # Determine verdict
     verdict = get_verdict(risk_score)
     
