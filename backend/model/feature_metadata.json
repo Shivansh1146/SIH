@@ -1,0 +1,133 @@
+{
+  "model_name": "ThreatLens Phishing URL Classifier",
+  "model_version": "1.0.0",
+  "phase": 4,
+  "training_date": "2026-08-24T14:26:09.175180+00:00",
+  "algorithm": "RandomForestClassifier",
+  "hyperparameters": {
+    "n_estimators": 200,
+    "random_state": 42,
+    "class_weight": "balanced",
+    "max_features": "sqrt"
+  },
+  "feature_names": [
+    "url_length",
+    "hostname_length",
+    "path_length",
+    "num_dots",
+    "num_hyphens",
+    "num_digits",
+    "num_special_chars",
+    "num_query_params",
+    "url_depth",
+    "num_subdomains",
+    "hostname_token_count",
+    "hostname_entropy",
+    "abnormal_hostname_length",
+    "https_enabled",
+    "http_enabled",
+    "ip_hostname",
+    "has_at_symbol",
+    "has_double_slash_in_path",
+    "punycode_detected",
+    "encoded_char_count",
+    "percent_encoded_count",
+    "url_entropy",
+    "suspicious_keyword_count",
+    "login_keyword_count",
+    "verify_keyword_count",
+    "account_keyword_count",
+    "secure_keyword_count",
+    "password_keyword_count",
+    "update_keyword_count",
+    "payment_keyword_count",
+    "brand_impersonation_indicator",
+    "brand_keyword_count",
+    "suspicious_tld",
+    "url_parameter_count"
+  ],
+  "feature_count": 34,
+  "dataset": {
+    "source": "https://raw.githubusercontent.com/faizann24/Using-Machine-Learning-To-Detect-Malicious-URLs/master/data/data.csv",
+    "description": "Phishing / malicious URL dataset by Faizan Ahmad, hosted on GitHub. ~420 000 URLs labelled good (legitimate) or bad (phishing/malware).",
+    "labels": {
+      "0": "legitimate",
+      "1": "phishing/malicious"
+    },
+    "training_rows_used": 60000,
+    "sample_cap": 60000
+  },
+  "metrics": {
+    "accuracy": 0.890333,
+    "precision": 0.890594,
+    "recall": 0.89,
+    "f1_score": 0.890297,
+    "confusion_matrix": [
+      [
+        5344,
+        656
+      ],
+      [
+        660,
+        5340
+      ]
+    ],
+    "test_set_size": 12000,
+    "phishing_test_count": 6000,
+    "legitimate_test_count": 6000,
+    "top_features": [
+      {
+        "rank": 1,
+        "name": "url_entropy",
+        "importance": 0.128443
+      },
+      {
+        "rank": 2,
+        "name": "path_length",
+        "importance": 0.11934
+      },
+      {
+        "rank": 3,
+        "name": "hostname_entropy",
+        "importance": 0.105838
+      },
+      {
+        "rank": 4,
+        "name": "num_digits",
+        "importance": 0.0986
+      },
+      {
+        "rank": 5,
+        "name": "url_length",
+        "importance": 0.092443
+      },
+      {
+        "rank": 6,
+        "name": "url_depth",
+        "importance": 0.077557
+      },
+      {
+        "rank": 7,
+        "name": "hostname_length",
+        "importance": 0.075561
+      },
+      {
+        "rank": 8,
+        "name": "num_hyphens",
+        "importance": 0.069266
+      },
+      {
+        "rank": 9,
+        "name": "num_dots",
+        "importance": 0.057024
+      },
+      {
+        "rank": 10,
+        "name": "suspicious_keyword_count",
+        "importance": 0.032236
+      }
+    ]
+  },
+  "model_file": "phishing_model.joblib",
+  "notes": "Phase 4 model uses 34 lexical/structural URL features only. No domain-age (WHOIS) or page-content features in this phase. Phase 5 adds SHAP explainability. Metrics are from real evaluation on a held-out test set."
+}

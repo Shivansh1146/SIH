@@ -2,9 +2,6 @@
 # ==================================
 # Install with:
 #   pip install -r requirements.txt
-#
-# Only packages actually used in the current phase are uncommented.
-# Future phases add their own deps below.
 
 # ── Phase 1 / 2 — Core API ────────────────────────────────────────────────
 flask==3.0.3
@@ -12,15 +9,16 @@ flask-cors==4.0.1
 
 # ── Phase 2 — Testing ─────────────────────────────────────────────────────
 pytest==8.2.2
-pytest-flask==1.3.0       # provides the `client` fixture for Flask apps
+pytest-flask==1.3.0
 
-# ── Phase 3+ (uncomment when needed) ──────────────────────────────────────
-# scikit-learn==1.5.1      # Phase 3 — model training baseline
-# xgboost==2.0.3           # Phase 3 — gradient-boosted classifier
-# pandas==2.2.2            # Phase 3 — dataset handling
-# numpy==1.26.4            # Phase 3 — numerical ops
-# joblib==1.4.2            # Phase 3 — model serialisation
-# tldextract==5.1.2        # Phase 2/3 — reliable URL parsing (add if needed)
-# python-whois==0.9.4      # Phase 2/3 — domain age lookup (add if needed)
-# shap==0.45.1             # Phase 5 — explainability
-# requests==2.32.3         # Phase 4 — live threat-intelligence lookups
+# ── Phase 4 — ML Training ─────────────────────────────────────────────────
+scikit-learn>=1.6.0
+pandas>=2.2.0
+numpy>=1.26.0
+joblib>=1.4.0
+requests>=2.32.0
+
+# ── Phase 5+ (uncomment when needed) ──────────────────────────────────────
+# shap==0.45.1             # Phase 5 — SHAP explainability
+# tldextract==5.1.2        # optional URL parser (if deeper domain parsing needed)
+# xgboost==2.0.3           # optional alternative to RandomForest
