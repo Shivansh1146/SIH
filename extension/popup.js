@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     
     if (!tab || tab.url.startsWith('chrome://')) {
-        showError("ThreatLens cannot scan Chrome system pages.");
+        showError("PhishGuard AI cannot scan Chrome system pages.");
         return;
     }
     

@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "ThreatLens",
+  "name": "PhishGuard AI",
   "version": "1.0.0",
   "description": "Real-time AI-based phishing detection and prevention.",
   "permissions": [
@@ -14,7 +14,7 @@
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "ThreatLens Scanner"
+    "default_title": "PhishGuard AI Scanner"
   },
   "content_scripts": [
     {

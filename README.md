@@ -1,4 +1,4 @@
-# ThreatLens 🔍
+# PhishGuard AI 🔍
 ### Real-Time AI/ML-Based Phishing Detection and Prevention System
 **SIH 2026 — Problem Statement #100**
 
@@ -21,9 +21,9 @@ Most existing tools:
 
 ---
 
-## 💡 Solution — ThreatLens
+## 💡 Solution — PhishGuard AI
 
-ThreatLens is an **explainable AI phishing detection system** that:
+PhishGuard AI is an **explainable AI phishing detection system** that:
 
 1. **Analyzes** every URL using 34 lexical/structural features
 2. **Scores** it 0–100 using a trained Random Forest classifier
@@ -32,7 +32,7 @@ ThreatLens is an **explainable AI phishing detection system** that:
 5. **Works** both as a web scanner and a Chrome extension
 
 > Traditional tools say: *"Dangerous website."*  
-> ThreatLens says: *"Dangerous — because the hostname contains a brand keyword in an unofficial domain, no HTTPS is active, and the URL contains multiple credential-related keywords."*
+> PhishGuard AI says: *"Dangerous — because the hostname contains a brand keyword in an unofficial domain, no HTTPS is active, and the URL contains multiple credential-related keywords."*
 
 ---
 
@@ -208,7 +208,7 @@ TLD Analysis:        suspicious_tld
 
 ### `GET /api/health`
 ```json
-{ "status": "ok", "service": "ThreatLens API" }
+{ "status": "ok", "service": "PhishGuard AI API" }
 ```
 
 ### `POST /api/scan`
@@ -326,8 +326,8 @@ pytest tests/ -v
 2. Toggle **Developer mode** ON (top-right corner)
 3. Click **Load unpacked**
 4. Select the `extension/` folder from this repo
-5. The ThreatLens icon appears in your toolbar — **no local server needed!**
-6. Browse any website — ThreatLens automatically scans it in the background
+5. The PhishGuard AI icon appears in your toolbar — **no local server needed!**
+6. Browse any website — PhishGuard AI automatically scans it in the background
 
 ### How it works
 - **SAFE (0–29)** → Green ✓ badge on the toolbar icon
@@ -370,7 +370,7 @@ pytest tests/ -v
 | 4 | Read reasons | "No HTTPS", "Brand impersonation", "Credential keywords" |
 | 5 | Read explainability | Feature importances: url_entropy, path_length |
 | 6 | Load extension → browse to GitHub | Popup shows low risk, badge shows ✓ |
-| 7 | Navigate to a suspicious URL | Full-page overlay: ⚠ THREATLENS WARNING |
+| 7 | Navigate to a suspicious URL | Full-page overlay: ⚠ PHISHGUARD AI WARNING |
 
 ---
 
@@ -425,4 +425,4 @@ Real-Time AI/ML-Based Phishing Detection and Prevention System
 
 ---
 
-*ThreatLens — See through phishing before it sees you.*
+*PhishGuard AI — See through phishing before it sees you.*

@@ -1,5 +1,5 @@
 """
-ThreatLens — Backend API
+PhishGuard AI — Backend API
 ========================
 Phase 2: Working Flask API with proper URL validation, CORS, and error handling.
 
@@ -118,9 +118,9 @@ def create_app() -> Flask:
         Liveness probe.
 
         Response 200:
-            { "status": "ok", "service": "ThreatLens API" }
+            { "status": "ok", "service": "PhishGuard AI API" }
         """
-        return jsonify({"status": "ok", "service": "ThreatLens API"}), 200
+        return jsonify({"status": "ok", "service": "PhishGuard AI API"}), 200
 
     @app.route("/api/scan", methods=["POST"])
     def scan():
@@ -203,7 +203,7 @@ app = create_app()
 try:
     from ml.explain import load_model as _load_model
     _load_model()
-    logging.getLogger(__name__).info("ThreatLens model pre-loaded successfully.")
+    logging.getLogger(__name__).info("PhishGuard AI model pre-loaded successfully.")
 except FileNotFoundError:
     logging.getLogger(__name__).warning(
         "Model file not found at startup — will load on first request."

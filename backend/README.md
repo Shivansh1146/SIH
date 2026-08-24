@@ -1,8 +1,8 @@
-# ThreatLens — Backend
+# PhishGuard AI — Backend
 
 > **SIH #100 — Real-Time AI/ML-Based Phishing Detection and Prevention System**
 
-This directory contains the Python/Flask backend for ThreatLens.
+This directory contains the Python/Flask backend for PhishGuard AI.
 
 ---
 
@@ -112,7 +112,7 @@ python app.py
 
 # 4. Test the health check
 curl http://localhost:5000/ping
-# → {"status": "ok", "service": "ThreatLens API", "phase": 1}
+# → {"status": "ok", "service": "PhishGuard AI API", "phase": 1}
 ```
 
 ---
@@ -124,7 +124,7 @@ curl http://localhost:5000/ping
 Liveness check. Returns `200 OK` when the server is running.
 
 ```json
-{ "status": "ok", "service": "ThreatLens API", "phase": 1 }
+{ "status": "ok", "service": "PhishGuard AI API", "phase": 1 }
 ```
 
 ### `POST /scan`

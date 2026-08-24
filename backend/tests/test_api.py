@@ -1,7 +1,7 @@
 """
 backend/tests/test_api.py
 =========================
-Pytest test suite for the ThreatLens Flask API — Phase 2.
+Pytest test suite for the PhishGuard AI Flask API — Phase 2.
 
 Run from the backend/ directory:
     pytest tests/ -v
@@ -56,7 +56,7 @@ class TestHealth:
         res = client.get("/api/health")
         data = res.get_json()
         assert data["status"] == "ok"
-        assert data["service"] == "ThreatLens API"
+        assert data["service"] == "PhishGuard AI API"
 
     def test_content_type_json(self, client):
         """Health response must declare application/json."""
