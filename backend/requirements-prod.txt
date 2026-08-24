@@ -1,0 +1,17 @@
+# ThreatLens — Production-only dependencies
+# ==========================================
+# This is the file used by Render at deploy time.
+# It contains ONLY what is needed to run the API.
+# Pandas, scipy, pytest are NOT included — they are not needed at runtime.
+#
+# To install locally for development (includes training + testing):
+#   pip install -r requirements.txt
+
+# ── Core API ──────────────────────────────────────────────────────────────────
+flask==3.0.3
+flask-cors==4.0.1
+
+# ── ML Inference only (no pandas, no scipy needed for prediction) ──────────────
+scikit-learn>=1.6.0
+numpy>=1.26.0
+joblib>=1.4.0
