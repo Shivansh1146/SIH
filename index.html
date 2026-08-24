@@ -929,9 +929,11 @@
     links.style.cssText += isOpen ? '' : 'position:absolute; top:64px; left:0; right:0; flex-direction:column; background:rgba(10,14,19,.98); padding:24px 20px; gap:18px; border-bottom:1px solid var(--border);';
   });
 
-    const BACKEND_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') 
-    ? 'http://127.0.0.1:5000' 
-    : 'https://threatlens-api.onrender.com'; // Change to actual production URL
+  // BACKEND_URL: auto-selects local or deployed Render URL.
+  // After deploying to Render, update the production URL below.
+  const BACKEND_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://127.0.0.1:5000'
+    : 'https://threatlens-api.onrender.com';
 
   /* ---------- Scan demo dataset ---------- */
   const examples = [

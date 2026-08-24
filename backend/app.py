@@ -195,6 +195,21 @@ def create_app() -> Flask:
 
 app = create_app()
 
+# ── Model pre-warm ────────────────────────────────────────────────────────────
+# Load the model into memory at startup so the first POST /api/scan request
+# is not slowed down by a cold joblib load.  If the file is missing (e.g. in a
+# test environment before training) the import is skipped gracefully.
+try:
+    from ml.explain import load_model as _load_model
+    _load_model()
+    logging.getLogger(__name__).info("ThreatLens model pre-loaded successfully.")
+except FileNotFoundError:
+    logging.getLogger(__name__).warning(
+        "Model file not found at startup — will load on first request."
+    )
+except Exception as _exc:
+    logging.getLogger(__name__).error("Model pre-load failed: %s", _exc)
+
 if __name__ == "__main__":
     debug = os.environ.get("FLASK_ENV", "production") == "development"
     app.run(host="0.0.0.0", port=5000, debug=debug)

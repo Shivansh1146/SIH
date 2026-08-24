@@ -6,6 +6,7 @@
 # ── Phase 1 / 2 — Core API ────────────────────────────────────────────────
 flask==3.0.3
 flask-cors==4.0.1
+gunicorn==22.0.0
 
 # ── Phase 2 — Testing ─────────────────────────────────────────────────────
 pytest==8.2.2
@@ -18,7 +19,7 @@ numpy>=1.26.0
 joblib>=1.4.0
 requests>=2.32.0
 
-# ── Phase 5+ (uncomment when needed) ──────────────────────────────────────
-# shap==0.45.1             # Phase 5 — SHAP explainability
-# tldextract==5.1.2        # optional URL parser (if deeper domain parsing needed)
-# xgboost==2.0.3           # optional alternative to RandomForest
+# ── Phase 9 — Production ─────────────────────────────────────────────────
+# shap==0.45.1             # Phase 5 — SHAP (not yet used)
+# tldextract==5.1.2        # optional URL parser
+# xgboost==2.0.3           # optional alternative classifier

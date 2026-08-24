@@ -1,0 +1,18 @@
+# render.yaml — Render.com deployment config for ThreatLens backend
+# Docs: https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: threatlens-api
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    plan: free
+    envVars:
+      - key: FRONTEND_ORIGIN
+        value: https://threatlens1.netlify.app
+      - key: FLASK_ENV
+        value: production
+      # Set PYTHON_VERSION if required by your runtime
+      # - key: PYTHON_VERSION
+      #   value: "3.11"

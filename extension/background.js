@@ -1,6 +1,8 @@
 // extension/background.js
 
-// Using local endpoint for MVP testing (could point to production URL as needed)
+// API URL: points to local backend for development.
+// For production, the extension would be configured to point to the Render deployment.
+// To switch: change this line to 'https://threatlens-api.onrender.com/api/scan'
 const API_URL = "http://127.0.0.1:5000/api/scan";
 
 // Cache for scan results per tab
