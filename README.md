@@ -2,7 +2,7 @@
 ### Real-Time AI/ML-Based Phishing Detection and Prevention System
 **SIH 2026 — Problem Statement #100**
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-threatlens-shield--shield.netlify.app-teal?style=flat-square)](https://threatlens-shield.netlify.app)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-shivansh1146.github.io%2FSIH-teal?style=flat-square)](https://shivansh1146.github.io/SIH)
 [![Backend API](https://img.shields.io/badge/API-sih--l2l2.onrender.com-purple?style=flat-square)](https://sih-l2l2.onrender.com/api/health)
 [![Tests](https://img.shields.io/badge/Tests-135%20passed-green?style=flat-square)](#testing)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE)
@@ -43,7 +43,7 @@ User Input (URL)
        │
        ▼
 ┌─────────────────┐
-│  Frontend       │  threatlens-shield.netlify.app
+│  Frontend       │  shivansh1146.github.io/SIH
 │  index.html     │  Plain HTML/CSS/JS — no framework
 └────────┬────────┘
          │  POST /api/scan
@@ -344,7 +344,7 @@ pytest tests/ -v
 ## ☁️ Deployment
 
 ### Frontend — Netlify
-- **URL:** https://threatlens-shield.netlify.app
+- **URL:** https://shivansh1146.github.io/SIH
 - Auto-deploys from the `main` branch on push
 - Config: `netlify.toml`
 
@@ -354,7 +354,7 @@ pytest tests/ -v
 - Config: `render.yaml`
 - Start command: `python app.py` (Memory optimized for 512MB RAM tier)
 - Dependencies: `requirements-prod.txt` (Excludes heavy training libraries like Pandas/SciPy)
-- Env vars: `FRONTEND_ORIGIN=https://threatlens-shield.netlify.app`
+- Env vars: `FRONTEND_ORIGIN=https://shivansh1146.github.io/SIH`
 
 > ⚠️ **Render Free Tier:** The service spins down after inactivity. The first request after idle may take 50–60 seconds to respond. Subsequent requests are fast.
 
@@ -364,7 +364,7 @@ pytest tests/ -v
 
 | Step | Action | Expected Result |
 |---|---|---|
-| 1 | Open https://threatlens-shield.netlify.app | Frontend loads with scanner |
+| 1 | Open https://shivansh1146.github.io/SIH | Frontend loads with scanner |
 | 2 | Scan `https://github.com` | Low risk score, SAFE or SUSPICIOUS verdict |
 | 3 | Scan `http://paypal-secure-login.example.com` | Score 85+, DANGEROUS verdict |
 | 4 | Read reasons | "No HTTPS", "Brand impersonation", "Credential keywords" |
