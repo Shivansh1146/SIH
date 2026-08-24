@@ -322,14 +322,21 @@ pytest tests/ -v
 
 ## 🔌 Chrome Extension Installation
 
-1. Open Chrome → `chrome://extensions`
-2. Toggle **Developer mode** ON (top-right)
+1. Open Chrome → type `chrome://extensions` → press Enter
+2. Toggle **Developer mode** ON (top-right corner)
 3. Click **Load unpacked**
 4. Select the `extension/` folder from this repo
-5. Ensure the Flask backend is running locally
-6. Browse any website — ThreatLens will automatically scan it
+5. The ThreatLens icon appears in your toolbar — **no local server needed!**
+6. Browse any website — ThreatLens automatically scans it in the background
 
-> **Note:** The extension currently points to `http://127.0.0.1:5000` (local). For production use, update `API_URL` in `extension/background.js` to `https://sih-l2l2.onrender.com/api/scan`.
+### How it works
+- **SAFE sites** → Green ✓ badge on the toolbar icon
+- **SUSPICIOUS sites** → Yellow badge + popup warning
+- **HIGH RISK / DANGEROUS sites** → Full-page red overlay blocks navigation with "Go Back" button
+
+> **API:** The extension calls `https://sih-l2l2.onrender.com/api/scan` (live production backend — no local setup required).
+
+> ⚠️ **Cold start:** If the Render backend has been idle for 15+ minutes, the first scan may take ~30 seconds. Subsequent scans are instant.
 
 ---
 
@@ -368,10 +375,10 @@ pytest tests/ -v
 
 ## ⚠️ Known Limitations
 
-1. **Render cold start:** Free tier spins down after 15 min of inactivity — first scan is slow
-2. **Short domain bias:** The training dataset causes the model to give higher risk scores to very short URLs (e.g., `github.com`). This is a known dataset artifact, not a code bug
-3. **Lexical only:** All 34 features are extracted from the URL string. No DOM analysis, no WHOIS, no live threat intelligence
-4. **Extension requires local backend:** The extension currently needs the Flask server running locally
+1. **Render cold start:** Free tier spins down after 15 min of inactivity — first scan after idle is slow (~30s)
+2. **Short domain bias:** Very short bare domains (e.g. `github.com`) have low entropy and may score higher than expected. A heuristic override protects known official brand domains
+3. **Lexical only:** All 34 features are extracted from the URL string only. No DOM analysis, no WHOIS, no live threat intelligence feeds
+4. **YouTube / non-brand sites:** Sites not in the brand list that have query parameters may score as SUSPICIOUS (30–59) — this is honest model behavior, not a bug
 
 ---
 
