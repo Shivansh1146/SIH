@@ -193,12 +193,12 @@ TLD Analysis:        suspicious_tld
 
 ## ⚡ Risk Scoring
 
-| Score | Verdict | Behavior |
+| Score | Verdict | Browser Behavior |
 |---|---|---|
-| 0–29 | 🟢 SAFE | Allow normally |
-| 30–59 | 🟡 SUSPICIOUS | Allow, show in popup |
-| 60–79 | 🟠 HIGH RISK | Extension overlay — warn + allow |
-| 80–100 | 🔴 DANGEROUS | Extension overlay — warn + Go Back |
+| 0–29 | 🟢 SAFE | Green ✓ badge — allow normally |
+| 30–59 | 🟡 SUSPICIOUS | Yellow ? badge — allow, no interruption |
+| 60–79 | 🟠 HIGH RISK | Orange ! badge — allow, no interruption |
+| 80–100 | 🔴 DANGEROUS | Full-page red overlay — **Go Back / Continue Anyway** |
 
 ---
 
@@ -330,9 +330,10 @@ pytest tests/ -v
 6. Browse any website — ThreatLens automatically scans it in the background
 
 ### How it works
-- **SAFE sites** → Green ✓ badge on the toolbar icon
-- **SUSPICIOUS sites** → Yellow badge + popup warning
-- **HIGH RISK / DANGEROUS sites** → Full-page red overlay blocks navigation with "Go Back" button
+- **SAFE (0–29)** → Green ✓ badge on the toolbar icon
+- **SUSPICIOUS (30–59)** → Yellow ? badge — browsing continues normally
+- **HIGH RISK (60–79)** → Orange ! badge — browsing continues normally
+- **DANGEROUS (80–100)** → Full-page red overlay blocks navigation with **Go Back** and **Continue Anyway** buttons
 
 > **API:** The extension calls `https://sih-l2l2.onrender.com/api/scan` (live production backend — no local setup required).
 
