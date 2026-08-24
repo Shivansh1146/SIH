@@ -70,27 +70,22 @@ class TestHealth:
 
 class TestScanValid:
     def test_https_url(self, client):
-        """A valid https:// URL returns 200 and MODEL_NOT_CONNECTED."""
+        """A valid https:// URL returns 200."""
         res = post_scan(client, {"url": "https://example.com"})
         assert res.status_code == 200
 
     def test_response_shape(self, client):
-        """Response must include success, url, status, message fields."""
+        """Response must include ML fields."""
         res = post_scan(client, {"url": "https://github.com"})
         data = res.get_json()
         assert data["success"] is True
         assert data["url"] == "https://github.com"
-        assert data["status"] == "MODEL_NOT_CONNECTED"
-        assert "message" in data
-        assert isinstance(data["message"], str)
-        assert len(data["message"]) > 0
-
-    def test_no_fake_risk_score(self, client):
-        """Phase 2 must NOT return a risk score or verdict."""
-        res = post_scan(client, {"url": "https://paypal.com"})
-        data = res.get_json()
-        assert "score" not in data
-        assert "verdict" not in data
+        assert "risk_score" in data
+        assert "verdict" in data
+        assert "confidence" in data
+        assert "reasons" in data
+        assert "features" in data
+        assert "explanations" in data
 
     def test_http_url_accepted(self, client):
         """Plain http:// URLs are also valid."""

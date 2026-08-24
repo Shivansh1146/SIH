@@ -156,18 +156,16 @@ def create_app() -> Flask:
         if err:
             return _json_error(f"Invalid URL — {err}")
 
-        # ── Scan (Phase 2: stub response — no ML yet) ──────────────────────
+        # ── Scan (Phase 5: ML Inference & Explainability) ──────────────────────
         log.info("Scan requested for URL: %s", url)
 
-        return jsonify({
-            "success": True,
-            "url":     url,
-            "status":  "MODEL_NOT_CONNECTED",
-            "message": (
-                "Backend API is working. "
-                "ML pipeline will be connected in a later phase."
-            ),
-        }), 200
+        from ml.explain import analyze_url
+        result = analyze_url(url)
+        
+        if not result.get("success", False):
+            return _json_error(result.get("error", "Failed to analyze URL"), 500)
+
+        return jsonify(result), 200
 
     # ── Global error handlers ─────────────────────────────────────────────────
 
