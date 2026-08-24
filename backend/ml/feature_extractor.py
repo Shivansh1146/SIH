@@ -242,7 +242,10 @@ def _brand_impersonation(url_lower: str, hostname: str) -> tuple[int, int]:
         if brand in url_lower:
             count += url_lower.count(brand)
             # Not impersonation if the registered domain IS the brand
-            official = {f"{brand}.com", f"{brand}.net", f"{brand}.org", f"{brand}.io"}
+            official = {
+                f"{brand}.com", f"{brand}.net", f"{brand}.org", f"{brand}.io",
+                f"{brand}.ai", f"{brand}.app", f"{brand}.co"
+            }
             if reg_domain not in official:
                 impersonation = 1
 
