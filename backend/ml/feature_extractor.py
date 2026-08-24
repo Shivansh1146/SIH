@@ -1,7 +1,7 @@
 """
 backend/ml/feature_extractor.py
 ================================
-Phase 3 — URL Feature Extraction Engine for PhishGuard AI.
+Phase 3 — URL Feature Extraction Engine for ThreatLens-Shield.
 
 Converts a raw URL string into a deterministic, ordered feature vector
 suitable for training and running a phishing-detection ML model.

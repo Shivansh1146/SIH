@@ -69,7 +69,7 @@ async function scanUrl(url, tabId, domData) {
             chrome.tabs.sendMessage(tabId, { action: 'SHOW_PREVENTION', result: result }).catch(() => {});
         }
     } catch (err) {
-        console.error("PhishGuard AI Scan Failed:", err);
+        console.error("ThreatLens-Shield Scan Failed:", err);
     }
 }
 

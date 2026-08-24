@@ -59,10 +59,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 function injectWarningOverlay(data) {
     // Only inject once
-    if (document.getElementById('threatlens-warning-overlay')) return;
+    if (document.getElementById('threatlens-shield-warning-overlay')) return;
 
     const overlay = document.createElement('div');
-    overlay.id = 'threatlens-warning-overlay';
+    overlay.id = 'threatlens-shield-warning-overlay';
     
     const isDangerous = data.risk_score >= 80;
     const accentColor = isDangerous ? '#D0021B' : '#FF4B4B';

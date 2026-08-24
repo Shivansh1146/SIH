@@ -1,4 +1,4 @@
-# netlify.toml — PhishGuard AI frontend deployment config
+# netlify.toml — ThreatLens-Shield frontend deployment config
 
 [build]
   # The root of the repo contains index.html directly

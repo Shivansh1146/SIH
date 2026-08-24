@@ -1,4 +1,4 @@
-# PhishGuard AI — Production-only dependencies
+# ThreatLens-Shield — Production-only dependencies
 # ==========================================
 # This is the file used by Render at deploy time.
 # It contains ONLY what is needed to run the API.

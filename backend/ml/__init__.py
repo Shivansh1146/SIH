@@ -1,7 +1,7 @@
 """
 backend/ml/__init__.py
 ======================
-ML sub-package for PhishGuard AI.
+ML sub-package for ThreatLens-Shield.
 
 Phase 1: Empty — no modules exist yet.
 

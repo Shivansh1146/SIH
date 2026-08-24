@@ -1,7 +1,7 @@
 """
 backend/ml/train_model.py
 ==========================
-Phase 4 — PhishGuard AI ML Training Pipeline
+Phase 4 — ThreatLens-Shield ML Training Pipeline
 
 Dataset
 -------
@@ -316,7 +316,7 @@ def save_artifacts(
 
     # Metadata
     meta = {
-        "model_name":    "PhishGuard AI Phishing URL Classifier",
+        "model_name":    "ThreatLens-Shield Phishing URL Classifier",
         "model_version": "1.0.0",
         "phase":         4,
         "training_date": datetime.now(timezone.utc).isoformat(),
@@ -393,7 +393,7 @@ def verify_saved_model() -> None:
 # ─────────────────────────────────────────────────────────────────────────────
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="PhishGuard AI Phase 4 — Model Training")
+    parser = argparse.ArgumentParser(description="ThreatLens-Shield Phase 4 — Model Training")
     parser.add_argument(
         "--no-download",
         action="store_true",
@@ -403,7 +403,7 @@ def main() -> None:
 
     print()
     print("=" * 60)
-    print("  PhishGuard AI — Phase 4 Model Training Pipeline")
+    print("  ThreatLens-Shield — Phase 4 Model Training Pipeline")
     print("=" * 60)
     print(f"  Feature count   : {len(FEATURE_NAMES)}")
     print(f"  Sample cap      : {SAMPLE_SIZE if SAMPLE_SIZE else 'full dataset'}")

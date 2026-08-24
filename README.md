@@ -1,8 +1,8 @@
-# PhishGuard AI 🔍
+# ThreatLens-Shield 🔍
 ### Real-Time AI/ML-Based Phishing Detection and Prevention System
 **SIH 2026 — Problem Statement #100**
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-threatlens--shield.netlify.app-teal?style=flat-square)](https://threatlens-shield.netlify.app)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-threatlens-shield--shield.netlify.app-teal?style=flat-square)](https://threatlens-shield.netlify.app)
 [![Backend API](https://img.shields.io/badge/API-sih--l2l2.onrender.com-purple?style=flat-square)](https://sih-l2l2.onrender.com/api/health)
 [![Tests](https://img.shields.io/badge/Tests-135%20passed-green?style=flat-square)](#testing)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE)
@@ -21,9 +21,9 @@ Most existing tools:
 
 ---
 
-## 💡 Solution — PhishGuard AI
+## 💡 Solution — ThreatLens-Shield
 
-PhishGuard AI is an **explainable AI phishing detection system** that:
+ThreatLens-Shield is an **explainable AI phishing detection system** that:
 
 1. **Analyzes** every URL using 34 lexical/structural features
 2. **Scores** it 0–100 using a trained Random Forest classifier
@@ -32,7 +32,7 @@ PhishGuard AI is an **explainable AI phishing detection system** that:
 5. **Works** both as a web scanner and a Chrome extension
 
 > Traditional tools say: *"Dangerous website."*  
-> PhishGuard AI says: *"Dangerous — because the hostname contains a brand keyword in an unofficial domain, no HTTPS is active, and the URL contains multiple credential-related keywords."*
+> ThreatLens-Shield says: *"Dangerous — because the hostname contains a brand keyword in an unofficial domain, no HTTPS is active, and the URL contains multiple credential-related keywords."*
 
 ---
 
@@ -208,7 +208,7 @@ TLD Analysis:        suspicious_tld
 
 ### `GET /api/health`
 ```json
-{ "status": "ok", "service": "PhishGuard AI API" }
+{ "status": "ok", "service": "ThreatLens-Shield API" }
 ```
 
 ### `POST /api/scan`
@@ -326,8 +326,8 @@ pytest tests/ -v
 2. Toggle **Developer mode** ON (top-right corner)
 3. Click **Load unpacked**
 4. Select the `extension/` folder from this repo
-5. The PhishGuard AI icon appears in your toolbar — **no local server needed!**
-6. Browse any website — PhishGuard AI automatically scans it in the background
+5. The ThreatLens-Shield icon appears in your toolbar — **no local server needed!**
+6. Browse any website — ThreatLens-Shield automatically scans it in the background
 
 ### How it works
 - **SAFE (0–29)** → Green ✓ badge on the toolbar icon
@@ -425,4 +425,4 @@ Real-Time AI/ML-Based Phishing Detection and Prevention System
 
 ---
 
-*PhishGuard AI — See through phishing before it sees you.*
+*ThreatLens-Shield — See through phishing before it sees you.*

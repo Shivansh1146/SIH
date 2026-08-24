@@ -1,8 +1,8 @@
-# render.yaml — Render.com deployment config for ThreatLens backend
+# render.yaml — Render.com deployment config for ThreatLens-Shield backend
 # Docs: https://render.com/docs/blueprint-spec
 services:
   - type: web
-    name: threatlens-api
+    name: threatlens-shield-api
     runtime: python
     rootDir: backend
     buildCommand: pip install -r requirements-prod.txt

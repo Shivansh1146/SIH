@@ -1,7 +1,7 @@
 """
 backend/tests/__init__.py
 =========================
-Test package for PhishGuard AI backend.
+Test package for ThreatLens-Shield backend.
 
 Phase 1: Empty.
 

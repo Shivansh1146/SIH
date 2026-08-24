@@ -1,5 +1,5 @@
 {
-  "model_name": "PhishGuard AI Phishing URL Classifier",
+  "model_name": "ThreatLens-Shield Phishing URL Classifier",
   "model_version": "1.0.0",
   "phase": 4,
   "training_date": "2026-08-24T16:25:54.540347+00:00",

@@ -1,7 +1,7 @@
 """
 backend/ml/explain.py
 ======================
-Phase 5 — PhishGuard AI Risk Engine and Explainability
+Phase 5 — ThreatLens-Shield Risk Engine and Explainability
 
 Loads the trained Random Forest model and generates:
 1. Phishing probability [0.0 - 1.0]

@@ -1,5 +1,5 @@
 """
-PhishGuard AI — Backend API
+ThreatLens-Shield — Backend API
 ========================
 Phase 2: Working Flask API with proper URL validation, CORS, and error handling.
 
@@ -12,7 +12,7 @@ Environment variables
 ---------------------
   FRONTEND_ORIGIN   Comma-separated list of allowed CORS origins.
                     Defaults to localhost + the live Netlify URL.
-                    Example: FRONTEND_ORIGIN=https://threatlens1.netlify.app,http://localhost:3000
+                    Example: FRONTEND_ORIGIN=https://threatlens-shield1.netlify.app,http://localhost:3000
 
   FLASK_ENV         Set to "development" for debug mode (never set in production).
 """
@@ -49,7 +49,7 @@ def create_app() -> Flask:
         "http://localhost:5500",
         "http://127.0.0.1:5500",
         "https://threatlens-shield.netlify.app",
-        "https://threatlens1.netlify.app",  # legacy
+        "https://threatlens-shield1.netlify.app",  # legacy
     ]
     env_origins = os.environ.get("FRONTEND_ORIGIN", "")
     allowed_origins = (
@@ -118,9 +118,9 @@ def create_app() -> Flask:
         Liveness probe.
 
         Response 200:
-            { "status": "ok", "service": "PhishGuard AI API" }
+            { "status": "ok", "service": "ThreatLens-Shield API" }
         """
-        return jsonify({"status": "ok", "service": "PhishGuard AI API"}), 200
+        return jsonify({"status": "ok", "service": "ThreatLens-Shield API"}), 200
 
     @app.route("/api/scan", methods=["POST"])
     def scan():
@@ -203,7 +203,7 @@ app = create_app()
 try:
     from ml.explain import load_model as _load_model
     _load_model()
-    logging.getLogger(__name__).info("PhishGuard AI model pre-loaded successfully.")
+    logging.getLogger(__name__).info("ThreatLens-Shield model pre-loaded successfully.")
 except FileNotFoundError:
     logging.getLogger(__name__).warning(
         "Model file not found at startup — will load on first request."
