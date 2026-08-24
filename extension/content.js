@@ -49,7 +49,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
     
     if (request.action === 'SHOW_PREVENTION' && request.result) {
-        if (request.result.risk_score >= 60) {
+        // Only show full blocking overlay for DANGEROUS (80+)
+        // HIGH RISK (60-79) only updates the badge — no interruption
+        if (request.result.risk_score >= 80) {
             injectWarningOverlay(request.result);
         }
     }
