@@ -663,9 +663,10 @@
             </div>
             <div class="try-row">
               <span style="font-family:var(--font-mono); font-size:11.5px; color:var(--text-faint); padding-top:6px;">Try:</span>
-              <button class="try-chip" onclick="quickScan(0)">paypa1-secure-login.com</button>
-              <button class="try-chip" onclick="quickScan(2)">mail-google-support.com</button>
-              <button class="try-chip" onclick="quickScan(3)">github.com/anthropics</button>
+              <button class="try-chip" onclick="quickScan(0)">github.com</button>
+              <button class="try-chip" onclick="quickScan(1)">google.com</button>
+              <button class="try-chip" onclick="quickScan(2)">paypal.com</button>
+              <button class="try-chip" onclick="quickScan(3)">paypal-secure-login.com</button>
             </div>
             <div class="scan-stage">
               <div class="scan-line" id="scanLine"></div>
@@ -711,7 +712,7 @@
         <div class="feature">
           <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><line x1="16" y1="16" x2="21" y2="21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
           <h3>Real-time site analysis</h3>
-          <p>Domain age, redirect chains, obfuscated URLs and reputation signals are checked the instant a page loads — before you type a password.</p>
+          <p>URL structure, length, and obfuscation patterns are checked the instant a URL is scanned.</p>
         </div>
         <div class="feature">
           <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12l6 6L20 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
@@ -720,23 +721,23 @@
         </div>
         <div class="feature">
           <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M4 9h16" stroke="currentColor" stroke-width="1.8"/></svg></div>
-          <h3>Page &amp; form behavior</h3>
-          <p>Reads the DOM for password fields, OTP prompts and urgent language — the same tells a trained analyst looks for, applied to every page.</p>
+          <h3>Page &amp; form behavior (Coming soon)</h3>
+          <p>[Planned] Will read the DOM for password fields, OTP prompts and urgent language.</p>
         </div>
         <div class="feature">
           <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="6" height="6" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="4" width="6" height="6" stroke="currentColor" stroke-width="1.8"/><rect x="4" y="14" width="6" height="6" stroke="currentColor" stroke-width="1.8"/><line x1="14" y1="14" x2="20" y2="20" stroke="currentColor" stroke-width="1.8"/></svg></div>
-          <h3>QR-code inspection</h3>
-          <p>Decodes any QR code rendered on a page and checks its destination before you ever scan it with your phone.</p>
+          <h3>QR-code inspection (Coming soon)</h3>
+          <p>[Planned] Will decode any QR code rendered on a page and check its destination.</p>
         </div>
         <div class="feature">
           <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0l-4-4m4 4l4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
-          <h3>Download protection</h3>
-          <p>Flags double extensions, mismatched file types and risky archive contents, with hash-based reputation lookups.</p>
+          <h3>Download protection (Coming soon)</h3>
+          <p>[Planned] Will flag double extensions, mismatched file types and risky archive contents.</p>
         </div>
         <div class="feature">
           <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2l8 4v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10V6l8-4z" stroke="currentColor" stroke-width="1.8"/></svg></div>
-          <h3>Webmail link scanning</h3>
-          <p>Highlights dangerous links directly inside Gmail and Outlook web, before you click through from an email.</p>
+          <h3>Webmail link scanning (Coming soon)</h3>
+          <p>[Planned] Will highlight dangerous links directly inside Gmail and Outlook web.</p>
         </div>
       </div>
     </div>
@@ -760,13 +761,13 @@
         <div class="pipe-step">
           <span class="pipe-num">02</span>
           <h4>Analyze</h4>
-          <p>An XGBoost model scores dozens of features against threat intelligence and domain reputation data.</p>
+          <p>A RandomForest ML model scores dozens of lexical features extracted directly from the URL.</p>
         </div>
         <div class="pipe-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <div class="pipe-step">
           <span class="pipe-num">03</span>
           <h4>Explain</h4>
-          <p>SHAP attribution turns the model's output into the plain-language reasons you actually see.</p>
+          <p>Feature importances turn the model's output into the plain-language reasons you actually see.</p>
         </div>
         <div class="pipe-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <div class="pipe-step">
@@ -789,7 +790,7 @@
           <div class="explain-list">
             <div class="explain-item">
               <span class="idx">01</span>
-              <div><h4>Feature attribution</h4><p>SHAP values show exactly which signal moved the score, and by how much.</p></div>
+              <div><h4>Feature attribution</h4><p>Model feature importances show exactly which signal moved the score.</p></div>
             </div>
             <div class="explain-item">
               <span class="idx">02</span>
@@ -928,28 +929,16 @@
     links.style.cssText += isOpen ? '' : 'position:absolute; top:64px; left:0; right:0; flex-direction:column; background:rgba(10,14,19,.98); padding:24px 20px; gap:18px; border-bottom:1px solid var(--border);';
   });
 
+    const BACKEND_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') 
+    ? 'http://127.0.0.1:5000' 
+    : 'https://threatlens-api.onrender.com'; // Change to actual production URL
+
   /* ---------- Scan demo dataset ---------- */
   const examples = [
-    { url:'paypa1-secure-login.com/verify', score:94, verdict:'DANGEROUS', reasons:[
-      'Look-alike of paypal.com (character substitution)',
-      'Domain registered 3 days ago',
-      'Password + OTP fields on a non-HTTPS page'
-    ]},
-    { url:'chase.com.account-verify.net', score:78, verdict:'HIGH RISK', reasons:[
-      'Suspicious subdomain structure mimicking a trusted brand',
-      'Urgent language detected: "account will be suspended"',
-      'No valid SSL certificate found'
-    ]},
-    { url:'mail-google-support.com', score:61, verdict:'SUSPICIOUS', reasons:[
-      'Brand keyword used in an unrelated domain',
-      'Redirect chain detected across 3 hops',
-      'Low domain reputation score'
-    ]},
-    { url:'github.com/anthropics/claude', score:4, verdict:'SAFE', reasons:[
-      'Domain matches trusted registry entry',
-      'Valid HTTPS certificate, 12-year history',
-      'No credential-harvesting indicators found'
-    ]}
+    { url:'https://github.com' },
+    { url:'https://google.com' },
+    { url:'https://paypal.com' },
+    { url:'http://paypal-secure-login.example.com' }
   ];
 
   function verdictClass(v){
@@ -959,26 +948,6 @@
     return 'v-dangerous';
   }
 
-  function heuristicScan(raw){
-    const url = raw.toLowerCase();
-    let score = 8;
-    const reasons = [];
-    if (!/^https:\/\//.test(raw) && !/^http:\/\//.test(raw)) score += 4;
-    if (url.includes('-')) { score += url.split('-').length * 4; }
-    if (/login|verify|secure|update|confirm|account/.test(url)) { score += 22; reasons.push('Contains urgency/credential-related keywords in the URL'); }
-    if (/\d/.test(url.replace(/\.(com|net|org|io)/,''))) { score += 10; reasons.push('Numeric characters substituted into a brand-like domain'); }
-    if ((url.match(/\./g) || []).length > 2) { score += 14; reasons.push('Unusual number of subdomains'); }
-    if (url.length > 40) { score += 8; reasons.push('Long, obfuscated-looking URL'); }
-    if (reasons.length === 0) reasons.push('No high-risk lexical patterns found in the URL structure');
-    reasons.push('Domain reputation lookup: no prior threat reports');
-    score = Math.max(2, Math.min(97, score));
-    let verdict = 'SAFE';
-    if (score >= 90) verdict = 'DANGEROUS';
-    else if (score >= 70) verdict = 'HIGH RISK';
-    else if (score >= 40) verdict = 'SUSPICIOUS';
-    return { url: raw, score, verdict, reasons: reasons.slice(0,3) };
-  }
-
   function renderResult(data){
     const placeholder = document.getElementById('scanPlaceholder');
     const result = document.getElementById('result');
@@ -986,46 +955,103 @@
 
     placeholder.style.display = 'none';
     line.classList.remove('active');
-    void line.offsetWidth; // restart animation
-    line.classList.add('active');
+    
+    result.className = 'result show ' + verdictClass(data.verdict);
+    document.getElementById('verdictBadge').textContent = data.verdict;
 
-    setTimeout(() => {
-      result.className = 'result show ' + verdictClass(data.verdict);
-      document.getElementById('verdictBadge').textContent = data.verdict;
-
-      const reasonsList = document.getElementById('reasonsList');
-      reasonsList.innerHTML = '';
+    const reasonsList = document.getElementById('reasonsList');
+    reasonsList.innerHTML = '';
+    
+    if (data.reasons && data.reasons.length > 0) {
       data.reasons.forEach(r => {
         const div = document.createElement('div');
         div.className = 'reason';
         div.innerHTML = '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>' + r + '</span>';
         reasonsList.appendChild(div);
       });
+    }
 
-      // animate score count-up
-      const scoreEl = document.getElementById('scoreNum');
-      let cur = 0;
-      const target = data.score;
-      const step = Math.max(1, Math.round(target / 24));
-      const iv = setInterval(() => {
-        cur += step;
-        if (cur >= target){ cur = target; clearInterval(iv); }
-        scoreEl.textContent = cur;
-      }, 16);
-    }, 550);
+    let expContainer = document.getElementById('explanationsContainer');
+    if (!expContainer) {
+       expContainer = document.createElement('div');
+       expContainer.id = 'explanationsContainer';
+       expContainer.style.marginTop = '24px';
+       expContainer.style.paddingTop = '16px';
+       expContainer.style.borderTop = '1px solid var(--border)';
+       result.appendChild(expContainer);
+    }
+    
+    let expHTML = '<div style="font-size:12px; font-weight:600; text-transform:uppercase; color:var(--text-faint); margin-bottom:12px;">Why this score?</div>';
+    expHTML += '<div style="display:flex; flex-direction:column; gap:8px;">';
+    
+    if (data.explanations && data.explanations.length > 0) {
+      data.explanations.forEach(exp => {
+        expHTML += `
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:13px;">
+            <span style="color:var(--text);">${exp.feature}</span>
+            <span style="color:var(--text-faint);">${exp.value} (Imp: ${exp.importance})</span>
+          </div>
+        `;
+      });
+    } else {
+       expHTML += '<div style="font-size:13px; color:var(--text-faint);">No specific indicators found.</div>';
+    }
+    expHTML += '</div>';
+    expContainer.innerHTML = expHTML;
+
+    const scoreEl = document.getElementById('scoreNum');
+    let cur = 0;
+    const target = data.risk_score || 0;
+    const step = Math.max(1, Math.round(target / 24));
+    const iv = setInterval(() => {
+      cur += step;
+      if (cur >= target){ cur = target; clearInterval(iv); }
+      scoreEl.textContent = cur;
+    }, 16);
   }
 
-  function runScan(){
+  async function runScan(){
     const input = document.getElementById('urlInput');
     const val = input.value.trim();
     if (!val) { input.focus(); return; }
-    const match = examples.find(e => val.toLowerCase().includes(e.url.split('/')[0]));
-    renderResult(match || heuristicScan(val));
+
+    const placeholder = document.getElementById('scanPlaceholder');
+    const result = document.getElementById('result');
+    const line = document.getElementById('scanLine');
+
+    result.classList.remove('show');
+    placeholder.style.display = 'flex';
+    placeholder.innerHTML = '<span>Analyzing URL...</span>';
+    line.classList.remove('active');
+    void line.offsetWidth; 
+    line.classList.add('active');
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/scan`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: val })
+      });
+
+      if (!response.ok) {
+        throw new Error('ThreatLens API is unavailable.');
+      }
+
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Please enter a valid URL.');
+      }
+
+      renderResult(data);
+    } catch (err) {
+      line.classList.remove('active');
+      placeholder.innerHTML = `<span style="color:var(--danger)">${err.message || 'Scan timed out. Please try again.'}</span>`;
+    }
   }
 
   function quickScan(i){
     document.getElementById('urlInput').value = examples[i].url;
-    renderResult(examples[i]);
+    runScan();
   }
 
   document.getElementById('urlInput').addEventListener('keydown', (e) => {
@@ -1094,7 +1120,7 @@
     },
     {
       title: 'Analyze',
-      desc: 'An XGBoost model scores dozens of features — domain age, redirect chains, look-alike characters, form behavior — against live threat-intelligence and reputation data.',
+      desc: 'A RandomForest model scores dozens of lexical features — URL length, suspicious keywords, look-alike characters, and entropy.',
       icon: '<svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7.5" stroke="currentColor" stroke-width="1.8"/><line x1="16.2" y1="16.2" x2="21" y2="21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>'
     },
     {
