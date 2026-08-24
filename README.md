@@ -266,7 +266,7 @@ TLD Analysis:        suspicious_tld
 ### 1. Clone
 ```bash
 git clone https://github.com/Shivansh1146/SIH.git
-cd SIH/phishing_3
+cd SIH/ThreatLens-Shield
 ```
 
 ### 2. Backend Setup
