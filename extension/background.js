@@ -63,6 +63,9 @@ async function scanUrl(url, tabId, domData) {
             
             // Send back to popup if it's open
             chrome.runtime.sendMessage({ action: 'SCAN_COMPLETE', tabId: tabId, result: result });
+            
+            // Send to content script for potential prevention overlay
+            chrome.tabs.sendMessage(tabId, { action: 'SHOW_PREVENTION', result: result }).catch(e => {});
         }
     } catch (err) {
         console.error("ThreatLens Scan Failed:", err);

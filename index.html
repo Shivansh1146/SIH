@@ -999,6 +999,31 @@
     expHTML += '</div>';
     expContainer.innerHTML = expHTML;
 
+
+    let actionContainer = document.getElementById('preventionActionContainer');
+    if (actionContainer) actionContainer.remove();
+    
+    if (data.risk_score >= 60) {
+        actionContainer = document.createElement('div');
+        actionContainer.id = 'preventionActionContainer';
+        actionContainer.style.marginTop = '24px';
+        actionContainer.style.padding = '16px';
+        actionContainer.style.background = data.risk_score >= 80 ? 'rgba(208,2,27,0.1)' : 'rgba(255,75,75,0.1)';
+        actionContainer.style.border = '1px solid ' + (data.risk_score >= 80 ? 'rgba(208,2,27,0.3)' : 'rgba(255,75,75,0.3)');
+        actionContainer.style.borderRadius = '6px';
+        actionContainer.style.textAlign = 'center';
+        
+        const titleText = data.risk_score >= 80 ? 'DANGEROUS THREAT DETECTED' : 'HIGH RISK DETECTED';
+        const color = data.risk_score >= 80 ? 'var(--danger)' : 'var(--high)';
+        
+        actionContainer.innerHTML = `
+            <div style="color: ${color}; font-weight: bold; font-size: 14px; margin-bottom: 8px; letter-spacing: 0.5px;">⚠ ${titleText}</div>
+            <p style="font-size: 13px; color: var(--text); margin-bottom: 12px; line-height: 1.4;">ThreatLens extension would automatically block this page to protect your data.</p>
+            <button class="btn btn-primary" style="width: 100%; justify-content: center; background: ${color}; color: #fff; border: none;" onclick="openInstallModal()">Protect yourself</button>
+        `;
+        
+        result.appendChild(actionContainer);
+    }
     const scoreEl = document.getElementById('scoreNum');
     let cur = 0;
     const target = data.risk_score || 0;
