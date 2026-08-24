@@ -10,7 +10,7 @@ services:
     plan: free
     envVars:
       - key: FRONTEND_ORIGIN
-        value: https://threatlens1.netlify.app
+        value: https://threatlens-shield.netlify.app
       - key: FLASK_ENV
         value: production
       # Set PYTHON_VERSION if required by your runtime
